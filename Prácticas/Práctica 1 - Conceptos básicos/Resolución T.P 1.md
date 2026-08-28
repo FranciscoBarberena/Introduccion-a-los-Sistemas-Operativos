@@ -114,15 +114,14 @@ file prueba.exe
 
 | Comando | Significado | Comportamiento |
 | --- | --- | --- |
-| cd | *change directory* | Sirve para entrar a un directorio dentro de la terminal. Ej: **cd documents** |
-| mkdir | *make directory* | Cell 2.3 |
-| rmdir | *remove directory* | Cell 3.3 |
-| ln | Cell 4.2 | Cell 4.3 |
-| tail | Cell 5.2 | Cell 5.3 |
-| locate | Cell 6.2 | Cell 6.3 |
-| ls | Cell 7.2 | Cell 7.3 |
-| pwd | Cell 8.2 | Cell 8.3 |
-| cp | Cell 9.2 | Cell 9.3 |
+| cd | *change directory* | Sirve para entrar a un directorio. Ej: `cd documents` |
+| mkdir | *make directory* | Crea un directorio nuevo. Ej: `mkdir carpeta_a_crear` |
+| rmdir | *remove directory* | Elimina un directorio. Ej: `rmdir carpeta_a_borrar` |
+| ln | *link* | Crea un enlace a un directorio o archivo (como un acceso directo) en la carpeta donde estás ubicado. Ej: `ln -s [archivo_original] [nombre_del_enlace]`. En este caso, -s indica que es un enlace simbólico (si se borra o mueve el archivo, deja de funcionar) |
+| tail | *tail* | Muestra las últimas líneas de un archivo de texto. Ej: `tail -n 20 archivo.txt` -n 20 hace que muestre 20 líneas |
+| locate | *locate* | Busca en una base de datos interna un archivo Ej: `locate nombre archivo`. **Parámetros**:  -i ignora mayúsculas y minúsculas, -n 5 limita el número de resultados a 5. |
+| ls | *list* | Muestra una lista de todos los archivos y directorios de mi ubicación. Parámetros: -l incluye permisos, el dueño, el tamaño y la fecha, -a incluye los ocultos que empiezan con (.), -lh muestra el tamaño en unidades legibles |
+| pwd | *print working directory* | Muestra la ruta absoluta del directorio actual. **Parámetros:** -P ignora enlaces simbólicos (los que crea `ln`), -L tiene en cuenta enlaces simbólicos. |
+| cp | *copy* | Copia un archivo con otro nombre en el mismo lugar, o con el mismo nombre en otro lugar. Ej: `cp archivo.txt nuevo_nombre.txt` o `cp archivo.txt /nueva/ubicacion/`. **Parámetros:** -i pregunta antes de sobreescribir, -v muestra el paso a paso. |
 | mv | Cell 9.2 | Cell 9.3 |
 | find | Cell 9.2 | Cell 9.3 |
-
