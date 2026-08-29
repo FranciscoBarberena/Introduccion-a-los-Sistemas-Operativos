@@ -13,24 +13,24 @@
 * Es multiusuario
 * Es multitarea y multiprocesador. Permite ejecutar varios programas al mismo tiempo, y es compatible con procesadores *multi-core*.
 * Es altamente portable, por lo que se puede adaptar a distintos tipos de dispositivos.
-* Puede usar distintos interpretes de comandos o *Shells*. En particular, Debian usa *Bash*, pero esto es personalizable en Linux.
+* Puede usar distintos intérpretes de comandos o *Shells*. En particular, Debian usa *Bash*, pero esto es personalizable en Linux.
 * Permite el manejo de usuarios y permisos.
-* Trata a todo como un archivo. Los dispositivos se tratan como archivos en el directorio `/dev`.
+* Trata todo como un archivo. Los dispositivos se tratan como archivos en el directorio `/dev`.
 * Sus directorios tienen distintos propósitos asignados.
 
 
 ### Inciso B
 
-* Caracterísitcas de *Windows* en comparación con Linux:
+* Características de *Windows* en comparación con Linux:
     * *Windows* es software propietario. Es decir que: no se distribuye su código fuente y no provee las 4 libertades de Linux. 
     * No es *case-sensitive*.
     * Ambos son multiusuario, multitarea y multiprocesador. También puede administrar usuarios y permisos.
     * No es altamente portable. *Windows* solo se puede instalar en computadoras de uso general.
-    * *Windows* también permite instalar otros interpretes de comandos. Aunque por defecto usa PowerShell* y cmd.
+    * *Windows* también permite instalar otros intérpretes de comandos. Aunque por defecto usa PowerShell* y cmd.
     * No trata a todo como un archivo. Los dispositivos se administran en un menú separado.
     * Sus directorios son de uso general. 
 
-### Incisco C
+### Inciso C
 * GNU es un sistema operativo similar a Unix, pero con la distinción de que es totalmente libre. Por eso está licenciado bajo la GPL.
 
 ### Inciso D
@@ -77,7 +77,7 @@
     * Debian comenzó a ser desarrollado por Ian Murdock en 1993.
     * Se consolidó como una de las distribuciones más populares a principios de los 2000.
     * En 2004, el comienzo de Ubuntu generó controversia en cuanto a la compatibilidad con sistemas derivados de Debian.
-    * El sistema ha sufrido controversias en relación al uso de servicios no libres, pero continúa siendo una de las distribuciones más usadas hoy en día.crear un sistema operativo libre, disponible para todo el mundo.
+    * El sistema ha sufrido controversias en relación al uso de servicios no libres, pero continúa siendo una de las distribuciones más usadas hoy en día.
 
 ## Punto 3
 ### Inciso A
@@ -87,7 +87,7 @@
 * La estructura básica de GNU/Linux consiste en:
     * **Kernel**: es el núcleo del SO. Se encarga de administrar el uso del CPU y la memoria. De modo general, se encarga de que el *software* y el *hardware* puedan trabajar juntos.
     * **Las aplicaciones base:** incluyen herramientas básicas como compiladores y librerías, así como programas que usa el usuario.
-    * **Shell**: es el interprete de comandos. Dichos comandos pueden ser literales, en un shell con interfaz de consola (CLI) o pueden ser acciones del usuario en una interfaz gráfica (GUI).
+    * **Shell**: es el intérprete de comandos. Dichos comandos pueden ser literales, en un shell con interfaz de consola (CLI) o pueden ser acciones del usuario en una interfaz gráfica (GUI).
 
 ## Punto 4
 ### Inciso A
@@ -96,7 +96,7 @@
     * Coordinar el *software* y el *hardware*
     * Administra la memoria, el CPU y la E/S.
     * Es un núcleo monolítico e híbrido
-        * Es monolítico porque es un solo programa. Si se cuelga algo en el kernel, se cuelga todo.
+        * Es monolítico porque es un solo proceso. Si se cuelga algo en el kernel, se cuelga todo.
         * Es híbrido porque se le pueden cargar y descargar *drivers*, que le agregan funcionalidades distintas.
         * Todo el código del kernel se ejecuta en modo privilegiado.
 
@@ -138,10 +138,10 @@ grep "nombre_usuario" /etc/passwd | cut -d: -f7
 ## Punto 6
 ### Inciso A
 * Un sistema de archivos o *file system* es la manera en la que, en una computadora, se administran y organizan los archivos. Esto incluye:
-    * Métodos de acceso: cómo se acceden los datos contenidos en el archivo.
-    * Manejo de archivos: cómo actúan los mecanismos para almacenar, referenciar, compartir y proteger los archivos.
-    * Manejo de la memoria secundaria: Cómo se administra el espacio para los archivos en memoria secundaria.
-    * Mecanismos de integridad: con qué métodos se garantiza la incorruptibilidad del archivo.
+    * **Métodos de acceso:** cómo se acceden los datos contenidos en el archivo.
+    * **Manejo de archivos:** cómo actúan los mecanismos para almacenar, referenciar, compartir y proteger los archivos.
+    * **Manejo de la memoria secundaria:** Cómo se administra el espacio para los archivos en memoria secundaria.
+    * **Mecanismos de integridad:** con qué métodos se garantiza la incorruptibilidad del archivo.
 
 ### Inciso B
 * El contenido de cada uno de los directorios principales de Linux lo determina el FHS (*Filesystem Hierarchy Standard*). Estos son:
@@ -155,13 +155,72 @@ grep "nombre_usuario" /etc/passwd | cut -d: -f7
     * `/boot` son los archivos necesarios para el arranque de la máquina.
     * `/root` es el directorio home del superusuario root.
     * `/tmp` contiene archivos no persistentes que generan los programas.
-    * `/proc` contiene ficheros que hacen referencia a procesos que corren en el sistema, y le permiten obtener información acerca de que programas y procesos están corriendo en un momento dado.
+    * `/proc` contiene ficheros que hacen referencia a procesos que corren en el sistema, y le permiten obtener información acerca de qué programas y procesos están corriendo en un momento dado.
     * `/lib` contiene código de librerías que utilizan muchos programas.
+
+### Inciso C
+* Algunos sistemas de archivos soportados por GNU/Linux son: ext3, ext4, ReiserFS y XFS
+
+## Punto 7
+### Inciso A
+* Una partición de disco es una región de almacenamiento secundario, que se crea con el fin de que dicha área pueda manejarse de manera independiente a las otras.
+* Tipos de particiones:
+    * **Partición primaria:** división cruda del disco (solo puede haber 4 por disco). Se almacena información de la misma en el MBR.
+    * **Partición extendida o secundaria:** sirve para contener particiones lógicas en su interior. Solo puede existir una partición de este tipo por disco. No se define un tipo de *file system* directamente sobre ella. Es decir, no se guardan archivos en la partición extendida directamente, sino que dentro de la partición extendida, se crea una partición lógica. Es en esa partición lógica donde se guardan los archivos.
+    * **Partición lógica:** ocupa la totalidad o parte de la partición extendida y se le define un tipo de *file system*. Las particiones de este tipo se conectan como una lista enlazada entre sí. 
+
+### Inciso B
+* IDE era la interfaz estándar para la identificación de HDDs hasta que fue reemplazada por SATA. Los nombres de sus discos y particiones eran así:
+    * `/dev/hda`: configurado como Master en el 1er bus IDE
+    * `/dev/hdb`: configurado como Slave en el 1er bus IDE
+    * `/dev/hdc`: configurado como Master en el 2do bus IDE
+    * `/dev/hdd`: configurado como Slave en el 2do bus IDE
+    * Las particiones primarias se numeran del 1 al 4, con las lógicas usando los números del 5 en adelante.
+* SATA es la interfaz estándar usada actualmente por usuarios comunes. En cambio, la forma evolucionada de SCSI es el estándar para servidores. Sin embargo, la nomenclatura de ambos es idéntica en Linux:
+    * `/dev/sda` disco físico 1
+    * `/dev/sdb` disco físico 2
+    * `/dev/sdc` disco físico 3, etc...
+    * Las particiones primarias se numeran del 1 al 4, con las lógicas usando los números del 5 en adelante. Solo las particiones primarias pueden marcarse como *booteables*.
+
+### Inciso C
+# DUDA: TÉCNICAMENTE PODRÍAS TENER SOLO LA PARTICIÓN / Y LISTO?? MARCANDOLA COMO BOOTEABLE, Y DEJANDO /home y /boot COMO CARPETAS DENTRO DE LA ÚNICA PARTICIÓN
+* Se necesitan 3 particiones primarias. Una para el directorio raíz (`/`), una para el `/boot` y una que funcione como partición extendida, alojando las siguientes particiones lógicas:
+    * `/home` para documentos personales.
+    * Área de *swap* para mejorar rendimiento.
+    * Podrían crearse más a gusto del usuario
+* Todas las particiones utilizan el file system ext4, excepto por el área de *swap* que utiliza el tipo *swap*.
+* Las identificaciones y puntos de montaje serían:
+    * Disco físico: sda
+        * Partición `/`: 
+            * ID: sda1
+            * Punto de montaje: `/`
+        * Partición `/boot`: 
+            * ID: sda2
+            * Punto de montaje: `/boot/`
+        * Partición extendida (que aloja a las lógicas): 
+            * ID: sda3
+            * Punto de montaje: No tiene. Aunque técnicamente contiene a todas sus subparticiones lógicas, no las procesa usando un formato como ext4 o similar. Por lo tanto, no se puede acceder a sus subparticiones a través de ella, y no se encuentra en ninguna carpeta.
+            * Partición *SWAP*:
+                * ID: sda5
+                * Punto de montaje: No tiene, porque sus archivos no tienen organización alguna. Simplemente, cuando se satura la RAM, los archivos se dejan allí, pero no tienen un formato de *file system* como ext4.
+            * Partición `/home`: sda6
+                * ID: sda6
+                * Punto de montaje: `/home`
+### Inciso D
+* DUDA (???)
+
+### Inciso E
+* Sí, Linux puede leer las particiones que usan *file systems* propios de Windows como FAT o NTFS. Sin emabrgo, lo opuesto no es verdad, ya que *Windows* no puede leer particiones ext4.
+
+### Inciso F
+* Existen particionadores destructivos y no destructivos.
+    * **Particionadores destructivos:** solo permiten crear o eliminar particiones. Ej: **Fdisk**
+    * **Particionadores no destructivos:** permiten crear, eliminar, fusionar, dividir o editar particiones. Ej: **Gparted**, administrador de discos de *Windows*.
 
 ## Punto 10
 
 ### Inciso A
-* ?
+* DUDA a que se refiere
 
 ### Inciso B
 
@@ -177,8 +236,8 @@ grep "nombre_usuario" /etc/passwd | cut -d: -f7
         * p: pegar desde el portapapeles
         * u: deshacer
         * /frase: busca “frase” dentro del archivo
-* **Nano**: es un editor de textro que usa una interfaz por consola. Es similar al editor Pico, y fue creado para que haya una alternativa libre a dicho editor de Unix (fue una historia parecida a GNU con el propio Unix). El desarrollador principal del proyecto lo abandonó en 2016 por problemas con la *Free Software Foundation*.
-* **Mccedit**: es un editor de texto que viene incluido en el programa de manejo de archivos conocido como *Midnight Commander*. Se puede ejecutar como un programa aparte (fuera de *Midnight Commander*) y tiene características como: resaltado de sintaxis en muchos lenguajes, macros, indentación automática, uso de *mouse*, portapapeles, entre otras.
+* **Nano**: es un editor de texto que usa una interfaz por consola. Es similar al editor Pico, y fue creado para que haya una alternativa libre a dicho editor de Unix (fue una historia parecida a GNU con el propio Unix). El desarrollador principal del proyecto lo abandonó en 2016 por problemas con la *Free Software Foundation*.
+* **Mcedit**: es un editor de texto que viene incluido en el programa de manejo de archivos conocido como *Midnight Commander*. Se puede ejecutar como un programa aparte (fuera de *Midnight Commander*) y tiene características como: resaltado de sintaxis en muchos lenguajes, macros, indentación automática, uso de *mouse*, portapapeles, entre otras.
 
 ### Inciso C
 * Se debe realizar esta serie de comandos y acciones, teniendo Vim instalado:
@@ -189,7 +248,7 @@ cd ~
 vim prueba.exe
 ```
 ```
-Entrar a modo *insert* usando la tecla I
+Entrar a modo *insert* apretando la tecla I
 ```
 ```
 Escribir nombre y número de alumno, como si fuese un .txt normal (se puede usar el Enter para saltar de línea)
@@ -220,7 +279,7 @@ ls -l prueba.exe
         * Tecla Q: Sale del comando y vuelve a la terminal
     * `more archivo.txt` sería el comando
     * Se puede usar para leer la salida de otros comandos de la siguiente manera:
-        * `ls | more` mostaría página por página todos los archivos y directorios de la carpeta en la que estás parado.
+        * `ls | more` mostraría página por página todos los archivos y directorios de la carpeta en la que estás parado.
 
 ### Inciso E
 
@@ -230,7 +289,7 @@ file prueba.exe
 ```
 * Internamente, hace 3 pasos:
     * Realiza una *system call* llamada *stat()*, lo que le permite leer algunos metadatos de un archivo. Entre ellos, está la información de si el archivo es un archivo regular, un dispositivo o un directorio. Si es un directorio, lo reporta.
-    * Lee los "números mágicos" del archivo. Esto suelen ser los primeros bytes del mismo, y son una firma digital. El comando luego los compara con una base de datos interna, que asocia a cada *magic number* con un tipo de archivo.
+    * Lee los "números mágicos" del archivo. Estos suelen ser los primeros bytes del mismo, y son una firma digital. El comando luego los compara con una base de datos interna, que asocia a cada *magic number* con un tipo de archivo.
     * Si no tiene ningún número mágico reconocible, lee los primeros bloques (generalmente unos pocos kb), buscando palabras clave (ej: *program* para Pascal) o una codificación específica como ASCII o UTF-8 para determinar el tipo de archivo.
 
 ### Inciso F
@@ -251,6 +310,8 @@ file prueba.exe
 | mv | *move* | Sirve para mover o renombrar archivos y directorios. Ejemplo para mover: `mv archivo.txt /home/usuario/documentos/`. Ejemplo para renombrar: `mv viejo.txt nuevo.txt` |
 | find | *find* | Sirve para buscar un archivo por distintos criterios (nombre, tamaño, tipo, fecha, etc). **Ejemplo:** `find . -size 54k` busca archivos de 54 kilobytes.|
  
+
+
 
 
 
