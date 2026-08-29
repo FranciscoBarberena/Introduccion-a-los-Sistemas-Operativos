@@ -16,14 +16,8 @@
 * Puede usar distintos interpretes de comandos o *Shells*. En particular, Debian usa *Bash*, pero esto es personalizable en Linux.
 * Permite el manejo de usuarios y permisos.
 * Trata a todo como un archivo. Los dispositivos se tratan como archivos en el directorio `/dev`.
-* Sus directorios tienen distintos propósitos:
-    * `/home` son los archivos personales del usuario.
-    * `/dev` son los dispositivos conectados.
-    * `/var` son archivos que cambian con frecuencia. En `/var/log` se guardan los *logs* de los programas.
-    * `/etc` son las configuraciones de las bases de datos.
-    * `/bin` son archivos binarios y ejecutables.
-    * `/usr`
-    * `/boot` son los archivos necesarios para el arranque de la máquina.
+* Sus directorios tienen distintos propósitos asignados.
+
 
 ### Inciso B
 
@@ -140,6 +134,29 @@ echo $PATH
 ```
 grep "nombre_usuario" /etc/passwd | cut -d: -f7
 ``` 
+
+## Punto 6
+### Inciso A
+* Un sistema de archivos o *file system* es la manera en la que, en una computadora, se administran y organizan los archivos. Esto incluye:
+    * Métodos de acceso: cómo se acceden los datos contenidos en el archivo.
+    * Manejo de archivos: cómo actúan los mecanismos para almacenar, referenciar, compartir y proteger los archivos.
+    * Manejo de la memoria secundaria: Cómo se administra el espacio para los archivos en memoria secundaria.
+    * Mecanismos de integridad: con qué métodos se garantiza la incorruptibilidad del archivo.
+
+### Inciso B
+* El contenido de cada uno de los directorios principales de Linux lo determina el FHS (*Filesystem Hierarchy Standard*). Estos son:
+    * `/home` son los archivos personales del usuario.
+    * `/dev` son los dispositivos conectados.
+    * `/var` son archivos que cambian con frecuencia. En `/var/log` se guardan los *logs* de los programas.
+    * `/etc` son las configuraciones de las bases de datos.
+    * `/bin` son archivos binarios y ejecutables.
+    * `/sbin` se usa para almacenar programas esenciales del sistema, que usará el administrador del mismo.
+    * `/usr` son subdirectorios con archivos de programas y configuración del sistema. 
+    * `/boot` son los archivos necesarios para el arranque de la máquina.
+    * `/root` es el directorio home del superusuario root.
+    * `/tmp` contiene archivos no persistentes que generan los programas.
+    * `/proc` contiene ficheros que hacen referencia a procesos que corren en el sistema, y le permiten obtener información acerca de que programas y procesos están corriendo en un momento dado.
+    * `/lib` contiene código de librerías que utilizan muchos programas.
 
 ## Punto 10
 
