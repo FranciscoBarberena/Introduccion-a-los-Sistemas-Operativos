@@ -207,7 +207,7 @@ grep "nombre_usuario" /etc/passwd | cut -d: -f7
                 * ID: sda6
                 * Punto de montaje: `/home`
 ### Inciso D
-* DUDA (???)
+* DUDA distintos esquemas de particionamiento para distintos usos
 
 ### Inciso E
 * Sí, Linux puede leer las particiones que usan *file systems* propios de Windows como FAT o NTFS. Sin emabrgo, lo opuesto no es verdad, ya que *Windows* no puede leer particiones ext4.
@@ -217,10 +217,59 @@ grep "nombre_usuario" /etc/passwd | cut -d: -f7
     * **Particionadores destructivos:** solo permiten crear o eliminar particiones. Ej: **Fdisk**
     * **Particionadores no destructivos:** permiten crear, eliminar, fusionar, dividir o editar particiones. Ej: **Gparted**, administrador de discos de *Windows*.
 
+## Punto 8
+
+### Inciso A
+* La BIOS (*Basic Input/Output System*) es *firmware* que se almacena en un *chip* directamente soldado en la placa madre. Contiene la información necesaria para arrancar una computadora, con su última acción siendo leer el MBC del MBR, que comienza la carga del SO.
+
+### Inciso B
+* UEFI (*Unified Extensible Firmware Interface*) realiza las mismas tareas que la BIOS, y es su reemplazo en computadoras modernas. A diferencia de la BIOS, que era propietario de IBM, UEFI es un estándar abierto de la industria. En vez de ejecutar ciegamente los primeros 512 bytes del disco, tiene en su placa madre un puntero a la tabla de particiones GPT. De aquí sabe a dónde ir para llegar a la partición especial ESP, que es un file system FAT32, que UEFI puede leer. En dicha partición, busca el archivo `.efi` de arranque y lo ejecuta.
+
+### Inciso C
+* El MBR (*Master Boot Record*) son 512 bytes de un disco, que tienen información especial, y están siempre ubicados en el cilindro 0, cabeza 0,
+sector 1. Los primeros 446 bytes tienen instrucciones rudimentarias para que arranque el sistema operativo. Luego tiene la tabla de particiones primarias, que ocupa 64 bytes. Finalmente, se firma con 2 bytes especiales. La limitación de tener solo 4 particiones primarias viene de que la información de cada partición ocupa 16 bytes, y la tabla de particiones tiene un tamaño de 64 bytes.
+
+### Inciso D
+* Las siglas GPT significan *GUID Partition Table* y son el reemplazo de la tabla de particiones del MBR, eliminando la limitación de 4 particiones primarias. De cada partición se almacena el nombre y las coordenadas de inicio y fin.
+
+### Inciso E
+* Una vez que la BIOS o UEFI terminó su ejecución, no se cargó el sistema operativo en sí. Lo que se cargó fue un gestor de arranque, que es un programa con más complejidad, con instrucciones para iniciar un SO. Con el estándar UEFI, se almacenan en una partición especial llamada ESP (*EFI System Partition*). En cambio, con el estándar BIOS, para que se inicialize el gestor de arranque, la información de su ejecución tiene que estar en el primer sector de la partición marcada como booteable. Algunos gestores de arranque son:
+    * **GRUB:** es el estándar para Linux.
+    * ***Windows Boot Manager:*** es el estándar en *Windows*.
+
+### Inciso F
+DUDA preguntar esto porque es importante 
+* Con estándar BIOS:
+    * Se prende la computadora.
+    * Se ejecuta el código ubicado en el cilindro 0, cabeza 0, sector 1 del disco. Aquí está el MBR.
+    * Primero se ejecuta el MBC, con instrucciones simples que leen la tabla de particiones.
+    * Se lee la tabla de particiones, y se busca aquella con el flag de *booteable* activo.
+    * Una vez que se llega a la partición *booteable*, se ejecuta el primer sector de la misma, que tiene los primeros pasos de ejecución para inicializar el gestor de arranque.
+    * Una vez ejecutado el gestor de arranque, este perimte cargar el sistema operativo.
+* Con estándar UEFI:
+    * Se prende la computadora
+    * En la placa madre del chip *UEFI*, se tiene almacenada la ubicación del archivo del gestor de arranque.
+    * En el principio del disco, se lee la tabla de particiones GPT, para poder ubicar la partición con ID de UEFI (ESP).
+        * **Nota:** En realidad, en el primer sector del disco sigue estando el viejo MBR, que se mantiene por cuestiones de retro-compatibilidad. Es en el siguiente sector a ese donde se almacena la tabla GPT.
+    * En la partición ESP, se busca el archivo del gestor de arranque (la ubicación del mismo estaba almacenada en el chip UEFI, así que sabe donde buscarlo)
+    * Se revisa que no se trate de un archivo malicioso.
+    * Se ejecuta el gestor de arranque.
+    * El gestor de arranque carga el SO.
+
+### Inciso G
+DUDA es lo mismo que cualquier otro SO (el arranque en linux)?
+
+### Inciso H
+* DUDA que pasos se ejecutan al apagar una maquina linux
+
+### Inciso I
+* Sí, es posible, ya que hay gestores de arranque como GRUB que muestran un menú al ejecutarse. En este menú se encuentran los disintos archivos de arranque de cada SO instalado en una PC. 
+
+
 ## Punto 10
 
 ### Inciso A
-* DUDA a que se refiere
+* DUDA a que se refiere como se identifica a un archivo en linux
 
 ### Inciso B
 
