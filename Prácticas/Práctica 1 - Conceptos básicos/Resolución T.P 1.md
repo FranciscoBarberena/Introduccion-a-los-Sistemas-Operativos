@@ -266,7 +266,7 @@ DUDA es lo mismo que cualquier otro SO (el arranque en linux)?
 * Sí, es posible, ya que hay gestores de arranque como GRUB que muestran un menú al ejecutarse. En este menú se encuentran los disintos archivos de arranque de cada SO instalado en una PC. 
 
 
-## Punto 10
+## Punto 9
 
 ### Inciso A
 * DUDA a que se refiere como se identifica a un archivo en linux
