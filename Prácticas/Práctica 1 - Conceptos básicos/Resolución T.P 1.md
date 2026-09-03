@@ -359,6 +359,138 @@ file prueba.exe
 | mv | *move* | Sirve para mover o renombrar archivos y directorios. Ejemplo para mover: `mv archivo.txt /home/usuario/documentos/`. Ejemplo para renombrar: `mv viejo.txt nuevo.txt` |
 | find | *find* | Sirve para buscar un archivo por distintos criterios (nombre, tamaño, tipo, fecha, etc). **Ejemplo:** `find . -size 54k` busca archivos de 54 kilobytes.|
  
+## Punto 11
+
+* man
+    * Sirve para mostrar la documentación oficial o página de manual de cualquier otro comando del sistema. 
+    * `/usr/bin/man`
+    * Parámetros:
+        * --whatis
+        * -k [palabra clave]. Busca comandos que tengan la palabra clave en su descripción.
+* shutdown
+    * Se utiliza para apagar, reiniciar o programar el apagado del sistema de forma segura.
+    * `/usr/sbin/shutdown`
+    * Parámetros
+    * -h / --halt: Apaga el equipo deteniendo todos los procesos.
+    * -P / --poweroff: Apaga el equipo y corta la energía (acción por defecto).
+    * -r / --reboot: Reinicia el sistema.
+    * -c / --cancel: Cancela un apagado o reinicio programado.
+    * -k / --kmsg: Envía el mensaje de advertencia a los usuarios pero no apaga el sistema.
+* reboot
+    * Se utiliza para reiniciar el SO.
+    * `/usr/sbin/reboot`
+    * Parámetros
+        * -f (--force) Fuerza el reinicio inmediato. No contacta al gestor de inicio init ni a systemd. Puede causar pérdida de datos no guardados.
+        * -p (--poweroff) Apaga el equipo por completo en lugar de reiniciarlo. Actúa como el comando poweroff.
+        * -w (--wtmp-only) No reinicia el sistema. Solo registra la acción de reinicio en el archivo de historial /var/log/wtmp.
+        * -d (--no-wtmp) Reinicia el sistema pero suprime la escritura del registro en el archivo /var/log/wtmp.
+        * --halt Detiene el sistema (pasa a estado de suspensión/halt) en lugar de apagarlo o reiniciarlo.
+* halt
+    * Se utiliza para apagar el equipo de forma inmediata, rompiendo el flujo normal del sistema y deteniendo la CPU.
+    * `/usr/sbin/halt`
+    * Parámetros
+        * -p / --poweroff: Apaga el equipo y corta la corriente eléctrica de la máquina.
+        * --reboot: Reinicia el sistema en lugar de solo detenerlo (funciona igual que el comando reboot).
+        * -f / --force: Fuerza la parada inmediata. No contacta con el gestor de servicios (systemd). Puede causar pérdida de datos si hay archivos abiertos.
+        * -w / --wtmp-only: No apaga el sistema. Solo registra el evento de parada en el archivo de historial /var/log/wtmp.
+        * -d / --no-wtmp: Apaga el sistema pero no registra el evento en el archivo /var/log/wtmp.
+        * --no-wall: Apaga el equipo sin enviar el mensaje de advertencia a los usuarios conectados a la terminal.
+* uname
+    * Sirve para mostrar información detallada del sistema operativo y del kernel.
+    * `/usr/bin/uname`
+    * Parámetros
+        * -a o --all: Muestra toda la información del sistema en orden fijo.
+        * -s o --kernel-name: Muestra el nombre del núcleo (ej. Linux).
+        * -n o --nodename: Muestra el nombre de host o red del equipo.
+        * -r o --kernel-release: Muestra la versión o subtipo del kernel.
+        * -v o --kernel-version: Muestra la fecha y detalles de compilación del kernel.
+        * -m o --machine: Muestra la arquitectura del hardware de la máquina (ej. x86_64).
+        * -p o --processor: Muestra el tipo de procesador.
+        * -i o --hardware-platform: Muestra la plataforma de hardware.
+        * -o o --operating-system: Muestra el nombre del sistema operativo (ej. GNU/Linux)
+* dmesg
+    * Se utiliza para examinar y controlar el búfer de anillos del kernel. Muestra los mensajes generados por el núcleo del sistema, especialmente durante el arranque y al conectar hardware.
+    * `/usr/bin/dmesg`
+    * Parámetros
+        * -T (o --ctime): Muestra marcas de tiempo legibles por humanos (fecha y hora local) en lugar del tiempo en segundos desde el arranque.
+        * -C (o --clear): Limpia por completo el búfer de mensajes del kernel.
+        * -c (o --read-clear): Muestra el contenido actual del búfer y luego lo limpia.
+        * -w (o --follow): Modo interactivo. Espera y muestra nuevos mensajes en tiempo real (ideal para ver qué pasa al conectar un USB).
+        * -L (o --color): Organiza la salida usando colores para facilitar la lectura de advertencias y errores.
+        * -l (o --level): Filtra la salida por niveles de criticidad (separados por comas).Niveles: emerg, alert, crit, err, warn, notice, info, debug.
+        * -f (o --facility): Filtra por el componente que generó el mensaje.Componentes: kern, user, mail, daemon, auth, syslog, lpr, news.
+        * -n (o --console-level): Configura el nivel de los mensajes que se enviarán directamente a la consola de texto.
+        * -s (o --buffer-size): Define el tamaño del búfer utilizado para consultar al kernel (por defecto suele ser 16392 bytes).
+        * -H (o --human): Activa una salida amigable: habilita paginación automática, colores y marcas de tiempo amigables
+* lspci
+    * Sirve para mostrar información sobre todos los periféricos conectados al sistema, como tarjetas gráficas, de red, de sonido y controladores de disco.
+    * `/usr/bin/lspci`
+    * -v, -vv y -vvv aumentan el nivel del detalle de la información.
+* at
+    * Sirve para programar la ejecución de tareas una sola vez en un momento determinado.
+    * `/usr/bin/at`
+    * Parámetros
+        * -c: Muestra el contenido de un trabajo programado antes de que se ejecute.
+        * -f: Lee los comandos desde un archivo en lugar de la entrada estándar.
+        * -m: Envía un correo electrónico al usuario cuando la tarea finaliza, incluso si no hay salida en pantalla.
+        * -q: Especifica una letra de cola diferente (de a a z) para agrupar los trabajos.
+* head
+    * Se utiliza para mostrar las primeras líneas de un archivo de texto.
+    * /usr/bin/head
+    * Parámetros
+        * -n, --lines=[-]NUM: Muestra las primeras NUM líneas en lugar de las 10 predeterminadas. Si se usa con un signo menos (-n -NUM), imprime todo el archivo excepto las últimas NUM líneas.
+        * -c, --bytes=[-]NUM: Muestra los primeros NUM bytes del archivo. Si se usa con un signo menos (-c -NUM), imprime todo excepto los últimos NUM bytes.
+        * -q, --quiet, --silent: No muestra los encabezados con el nombre del archivo cuando se consultan varios archivos a la vez.
+* tail
+    * Sirve para mostrar las últimas líneas o partes de un archivo de texto.
+    * `/usr/bin/tail`
+    * Parámetros
+        * -n, --lines=[+]NUM: Muestra las últimas NUM líneas en lugar de las 10 predeterminadas. Si se usa con signo más (+NUM), muestra el contenido a partir de la línea número NUM.
+        * -c, --bytes=[+]NUM: Muestra los últimos NUM bytes del archivo. Con signo más (+NUM), muestra desde el byte indicado.
+        * -f, --follow: Monitorea el archivo en tiempo real; muestra las nuevas líneas que se van agregando al final del archivo de forma continua.
+        * -F: Similar a -f, pero realiza un seguimiento reforzado ("retry"), útil si el archivo se rota, se elimina y se vuelve a crear.
+        * -q, --quiet, --silent: No imprime las cabeceras con los nombres de los archivos cuando se consultan múltiples archivos a la vez.
+
+## Punto 12
+
+### Inciso A
+1. Se empieza a ejecutar el código del BIOS.
+2. El BIOS ejecuta el POST.
+3. El BIOS lee el sector de arranque (MBR).
+4. Se carga el gestor de arranque (MBC).
+5. El bootloader carga el kernel y el initrd ( initial ram disk).
+6. Se monta el initrd como sistema de archivos raíz y se inicializan componentes esenciales (por ejemplo, el scheduler).
+7. El Kernel ejecuta el proceso init y se desmonta el initrd.
+8. Se lee el `/etc/inittab`.
+9. Se ejecutan los scripts apuntados por el runlevel 1.
+10. El final del runlevel 1 le indica que vaya al runlevel por defecto.
+11. Se ejecutan los scripts apuntados por el runlevel por defecto.
+12. El sistema está listo para ser usado.
+
+### Inciso B
+* El proceso **init** es el único que se considera que no tiene padre, por lo que no es ejecutado por otro proceso. Su función es cargar todos los subprocesos necesarios para el
+correcto funcionamiento del Sistema Operativo. También es el encargado de montar los filesystems y de hacer disponible los demás dispositivos.
+
+### Inciso C
+* El *runlevel* es el nivel de ejecución en el que se encuentra el SO. Cada nivel limita la serie de servicios que se pueden ejecutar:
+
+### Inciso D
+* 0 → halt (parada o apagado).
+* 1 → single-user mode (modo monousuario).
+* 2 → multi-user without network support (multiusuario sin soporte de red).
+* 3 → multi-user console mode (modo multiusuario en consola).
+* 4 → N/A (no se utiliza).
+* 5 → X11 (modo multiusuario con entorno gráfico basado en X.org).
+* 6 → reboot (reinicio)
+
+### Inciso E
+* Por defecto, Linux se inicia en runlevel 3 o runlevel 5, dependiendo de si la distribución utiliza una interfaz gráfica o no.
+    * Esto se define en el archivo inittab. Particularmente, hay una directiva que es initdefault. El runlevel definido allí es en el que se va a iniciar el sistema. Por ejemplo: id:5:initdefault iniciaría en runlevel 5, con interfaz gráfica.
+
+### Inciso F
+* El archivo inittab sirve para dictarle a init qué debe hacer, qué programas debe arrancar y qué debe detener dependiendo del estado (runlevel) en el que se encuentre el sistema.
+* La estructura de la información almacenada es: id:runlevels:acción:proceso
+* Contiene los enlaces de los scripts. Estos a su vez contienen qué debería ejecutarse al pasar a un cierto runlevel. Su directorio es /etc/rcX.d (donde X es el número de runlevel entre 0 y 6) 
 
 
 
