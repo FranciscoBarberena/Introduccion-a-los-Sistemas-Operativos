@@ -483,15 +483,44 @@ correcto funcionamiento del Sistema Operativo. También es el encargado de monta
 * 5 → X11 (modo multiusuario con entorno gráfico basado en X.org).
 * 6 → reboot (reinicio)
 
-### Inciso E
 * Por defecto, Linux se inicia en runlevel 3 o runlevel 5, dependiendo de si la distribución utiliza una interfaz gráfica o no.
     * Esto se define en el archivo inittab. Particularmente, hay una directiva que es initdefault. El runlevel definido allí es en el que se va a iniciar el sistema. Por ejemplo: id:5:initdefault iniciaría en runlevel 5, con interfaz gráfica.
 
-### Inciso F
+### Inciso E
 * El archivo inittab sirve para dictarle a init qué debe hacer, qué programas debe arrancar y qué debe detener dependiendo del estado (runlevel) en el que se encuentre el sistema.
 * La estructura de la información almacenada es: id:runlevels:acción:proceso
-* Contiene los enlaces de los scripts. Estos a su vez contienen qué debería ejecutarse al pasar a un cierto runlevel. Su directorio es /etc/rcX.d (donde X es el número de runlevel entre 0 y 6) 
+* Contiene las asociaciones de qué scripts deben realizarse al pasar a cada *runlevel*. El directorio de los enlaces a los scripts es /etc/rcX.d (donde X es el número de runlevel entre 0 y 6).
 
+### Inciso F
+* Para cambiar a runlevel Y, se tiene que ejecutar el comando init Y, con permisos de sudo. El cambio dura hasta que se reinicia la máquina, ya que no se modifica la directiva initdefault.
+
+### Inciso G
+* Los scripts rcX.d contienen enlaces a los scripts que se tienen que realizar al cambiar al runlevel X. 
+* Los scripts en sí se almacenan en `/etc/init.d/`.
+* Los enlaces en rcX.d tienen este patrón:
+    * [S|K] `orden` `nombre`
+    * S y K determinan si dicho script debe ejecutarse o detenerse respectivamente (start/kill).
+    * El orden es un número de 2 dígitos que establece la prioridad del *script*. Esto determina el orden de ejecución de los mismos, lo que resuelve dependencias entre *scripts*.
+    * El nombre es simplemente el nombre lógico que se le da al *script*.
+
+## Punto 13
+### Inciso A
+* Systemd es un sistema que centraliza la administración de demonios (servicios) y librerías del sistema. Reemplaza a systemV, mejorando el paralelismo de arranque.
+* Cambios de terminología comparado a systemV:
+    * *Runlevel* ----> *target*
+    * No utiliza `/etc/inittab`.
+
+### Inciso B
+* Una *Unit* en systemd es una unidad de trabajo. Pueden estar en estado *active* o *inactive* y tienen distintos tipos:
+    * *Service*: controla un servicio particular.
+    * *Socket*: encapsula IPC, un *socket* del sistema o *file system* FIFO.
+    * *Target*: agrupa *units* o establece puntos de sincronización durante el arranque.
+    * *Snapshot*: almacena el estado de un conjunto de unidades para que pueda ser restablecido más tarde.
+
+### Inciso C
+* El comando `systemctl` se utiliza para administrar y controlar los servicios y el estado del sistema en distribuciones de Linux que usan `systemd`. Reemplaza al comando *init*
+
+### Inciso D
 
 
 
