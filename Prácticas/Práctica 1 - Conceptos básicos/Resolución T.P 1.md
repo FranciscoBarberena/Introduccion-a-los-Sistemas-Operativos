@@ -183,29 +183,13 @@ grep "nombre_usuario" /etc/passwd | cut -d: -f7
     * Las particiones primarias se numeran del 1 al 4, con las lógicas usando los números del 5 en adelante. Solo las particiones primarias pueden marcarse como *booteables*.
 
 ### Inciso C
-# DUDA: TÉCNICAMENTE PODRÍAS TENER SOLO LA PARTICIÓN / Y LISTO?? MARCANDOLA COMO BOOTEABLE, Y DEJANDO /home y /boot COMO CARPETAS DENTRO DE LA ÚNICA PARTICIÓN
-* Se necesitan 3 particiones primarias. Una para el directorio raíz (`/`), una para el `/boot` y una que funcione como partición extendida, alojando las siguientes particiones lógicas:
-    * `/home` para documentos personales.
-    * Área de *swap* para mejorar rendimiento.
-    * Podrían crearse más a gusto del usuario
-* Todas las particiones utilizan el file system ext4, excepto por el área de *swap* que utiliza el tipo *swap*.
+
+* Se necesita 1 sola partición primaria, que aloja al directorio raíz (`/`).
 * Las identificaciones y puntos de montaje serían:
     * Disco físico: sda
         * Partición `/`: 
             * ID: sda1
             * Punto de montaje: `/`
-        * Partición `/boot`: 
-            * ID: sda2
-            * Punto de montaje: `/boot/`
-        * Partición extendida (que aloja a las lógicas): 
-            * ID: sda3
-            * Punto de montaje: No tiene. Aunque técnicamente contiene a todas sus subparticiones lógicas, no las procesa usando un formato como ext4 o similar. Por lo tanto, no se puede acceder a sus subparticiones a través de ella, y no se encuentra en ninguna carpeta.
-            * Partición *SWAP*:
-                * ID: sda5
-                * Punto de montaje: No tiene, porque sus archivos no tienen organización alguna. Simplemente, cuando se satura la RAM, los archivos se dejan allí, pero no tienen un formato de *file system* como ext4.
-            * Partición `/home`: sda6
-                * ID: sda6
-                * Punto de montaje: `/home`
 ### Inciso D
 * DUDA distintos esquemas de particionamiento para distintos usos
 
