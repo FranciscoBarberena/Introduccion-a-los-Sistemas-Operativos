@@ -229,7 +229,7 @@ DUDA preguntar esto porque es importante
     * Primero se ejecuta el MBC, con instrucciones simples que leen la tabla de particiones.
     * Se lee la tabla de particiones, y se busca aquella con el flag de *booteable* activo.
     * Una vez que se llega a la partición *booteable*, se ejecuta el primer sector de la misma, que tiene los primeros pasos de ejecución para inicializar el gestor de arranque.
-    * Una vez ejecutado el gestor de arranque, este perimte cargar el sistema operativo.
+    * Una vez ejecutado el gestor de arranque, este permite cargar el sistema operativo.
 * Con estándar UEFI:
     * Se prende la computadora
     * En la placa madre del chip *UEFI*, se tiene almacenada la ubicación del archivo del gestor de arranque.
@@ -241,26 +241,26 @@ DUDA preguntar esto porque es importante
     * El gestor de arranque carga el SO.
 
 ### Inciso G
-DUDA es lo mismo que cualquier otro SO (el arranque en linux)?
+DUDA es lo mismo que cualquier otro SO (el arranque en Linux)?
 
 ### Inciso H
-* DUDA que pasos se ejecutan al apagar una maquina linux
+* DUDA que pasos se ejecutan al apagar una maquina Linux
 
 ### Inciso I
-* Sí, es posible, ya que hay gestores de arranque como GRUB que muestran un menú al ejecutarse. En este menú se encuentran los disintos archivos de arranque de cada SO instalado en una PC. 
+* Sí, es posible, ya que hay gestores de arranque como GRUB que muestran un menú al ejecutarse. En este menú se encuentran los distintos archivos de arranque de cada SO instalado en una PC. 
 
 
 ## Punto 9
 
 ### Inciso A
-* DUDA a que se refiere como se identifica a un archivo en linux
+* DUDA a que se refiere como se identifica a un archivo en Linux
 
 ### Inciso B
 
 * **Vim**: es un editor de texto que se puede usar tanto por consola como con una interfaz gráfica (modo GUI). Tiene 7 modos, aunque en la cátedra se nombraron 3:
     * Modo *insert* (activado con la tecla I): es para editar contenido como en un editor moderno. 
     * Modo visual (activado con la tecla V): es para seleccionar áreas de texto. Se pueden correr comandos sobre las áreas seleccionadas.
-    * Modo normal (activado con la tecla esc): es para comandos de editor. Es el modo por *default*.
+    * Modo normal (activado con la tecla Esc): es para comandos de editor. Es el modo por *default*.
     * Algunos de sus comandos son:
         * w: escribir cambios
         * q o q!: salir del editor
@@ -505,6 +505,148 @@ correcto funcionamiento del Sistema Operativo. También es el encargado de monta
 * El comando `systemctl` se utiliza para administrar y controlar los servicios y el estado del sistema en distribuciones de Linux que usan `systemd`. Reemplaza al comando *init*
 
 ### Inciso D
+
+* En systemd, un *target* agrupa *units* o establece puntos de sincronización durante el arranque. Son el reemplazo de los *runlevels*
+
+### Inciso E
+* El comando `pstree` muestra todos los procesos en ejecución en forma de un diagrama de árbol jerárquico
+
+## Punto 14
+
+### Inciso A
+
+* La información sobre los usuarios en GNU/Linux se almacena en:
+    * /etc/passwd
+    * /etc/group
+    * /etc/shadow
+
+### Inciso B
+
+* La UID o user ID es la identificación única de un usuario en Linux. Por lo tanto, no pueden repetirse entre usuarios.
+* La GID funciona como identificación única de un grupo de usuarios.
+
+### Inciso C
+
+* El usuario root es el usuario administrador del sistema o super-usuario. Solo existe un usuario root, pero se le pueden otorgar permisos de root a un usuario común, agregándolos al archivo etc/sudoers.
+* La UID del usuario root es 0.
+
+### Inciso D
+* Detalle paso por paso:
+
+0. Para ejecutar estos comandos se necesita permisos de *root*. Para obtenerlos hay que acceder como usuario root (no recomendado) o darle permisos de sudo al usuario actual.
+
+1. Crear usuario *isocso*
+```
+sudo useradd isocso
+```
+
+2. Asignar nuevo *home*
+```
+mkdir isocso
+```
+```
+sudo usermod -d /home/isocso/ isocso
+```
+Para revisar que haya funcionado (lista los home de todos los usuarios):
+```
+cat /etc/passwd | grep '/home' | cut -d: -f1,6
+```
+3. Crear grupo ”informática”
+```
+sudo groupadd informatica
+```
+
+4. Añadir usuario al grupo
+```
+sudo usermod -aG informatica isocso
+```
+
+5. Crear archivo (en /home/isocso)
+```
+touch test.txt
+```
+
+6. Dar propiedad del archivo al usuario y a su grupo
+```
+chown isocso:informatica test.txt
+```
+7. Borrar usuario
+```
+sudo userdel isocso
+```
+8. Borrar grupo
+```
+sudo groupdel informatica
+```
+
+9. Ver lista de usuarios
+```
+cut -d: -f1 /etc/passwd
+```
+10. Ver lista de grupos
+```
+getent group
+```
+
+### Inciso E
+| **Nombre del comando** | **Significado en inglés**     | **Funcionalidad**                                                                                                                                                                                                | **Parámetros (Ejemplos comunes)**                                                                                         |
+| ---------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **useradd**            | User Add                      | Comando de bajo nivel para crear un nuevo usuario. Por defecto, solo crea la entrada en `/etc/passwd` sin configurar carpeta home, contraseña ni shell (depende de la configuración de la distribución).         | `-m` (crea el directorio home) `-s /bin/bash` (define la shell) `-g grupo` (define grupo principal)                       |
+| **adduser**            | Add User                      | Interfaz de alto nivel y amigable para `useradd` (muy común en Debian/Ubuntu). Es interactivo: te pregunta paso a paso la contraseña, nombre real y crea automáticamente el directorio home y los archivos base. | `--system` (crea un usuario de sistema sin home ni shell interactiva)                                                     |
+| **usermod**            | User Modify                   | Modifica las propiedades de una cuenta de usuario ya existente (cambia su home, su shell, su nombre de login, o sus grupos).                                                                                     | `-aG grupo` (agrega el usuario a un grupo suplementario sin borrar los anteriores) `-d /nueva/ruta` (cambia el home)      |
+| **userdel**            | User Delete                   | Elimina la cuenta de un usuario del sistema (borra su entrada de `/etc/passwd` y `/etc/shadow`).                                                                                                                 | `-r` (elimina también el directorio personal `/home/usuario` y su buzón de correo)                                        |
+| **su**                 | Substitute User / Switch User | Permite cambiar la identidad del usuario actual en la terminal por la de otro usuario (requiere conocer la contraseña del usuario de destino). Si se usa sin argumentos, asume que quieres ser `root`.           | `-` o `-l` (simula un login completo, cargando las variables de entorno y el path del nuevo usuario)                      |
+| **groupadd**           | Group Add                     | Crea un nuevo grupo lógico en el sistema (agrega una entrada en el archivo `/etc/group`).                                                                                                                        | `-g GID` (fuerza la asignación de un ID de grupo numérico específico en lugar de uno automático)                          |
+| **who**                | Who is logged in              | Muestra una lista de los usuarios que están actualmente conectados al sistema, indicando desde qué terminal (tty/pts) y la hora de conexión.                                                                     | `-a` (muestra toda la información disponible) `-b` (muestra la hora del último reinicio)                                  |
+| **groupdel**           | Group Delete                  | Elimina un grupo existente del sistema. (Nota: No puedes eliminar el grupo principal de un usuario si ese usuario todavía existe).                                                                               | -                                                               |
+| **passwd**             | Password                      | Permite cambiar la contraseña de un usuario (actualiza el hash en `/etc/shadow`). Un usuario normal solo puede cambiar la suya propia; el root puede cambiar la de cualquiera.                                   | `-l` (bloquea la cuenta) `-u` (desbloquea la cuenta) `-e` (fuerza al usuario a cambiar su contraseña en el próximo login) |
+
+## Punto 15
+### Inciso A
+* Los permisos sobre un archivo se dividen entre permisos de lectura, escritura y ejecución. Dichos permisos se definen para el usuario dueño, para el grupo dueño, y para el resto del mundo.
+
+### Inciso B
+| **Nombre del comando** | **Significado en inglés** | **Funcionalidad**                                                                                                                                                                                                                 | **Parámetros (Ejemplos comunes)**                                                                                                                                                                                       |
+| ---------------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **chmod**              | Change Mode               | Modifica los permisos de acceso (lectura `r`, escritura `w`, ejecución `x`) de un archivo o directorio. Puede usarse mediante notación octal (números) o simbólica (letras).                                                      | `-R` (recursivo: aplica los cambios a todos los archivos y subdirectorios dentro de una carpeta) `+x` (notación simbólica: añade permiso de ejecución) `755` (notación octal: rwx para el dueño, rx para grupo y otros) |
+| **chown**              | Change Owner              | Cambia el usuario propietario (dueño) de un archivo o directorio. También permite cambiar simultáneamente el grupo propietario.                                  | `-R` (recursivo: aplica el cambio de dueño a todo el contenido de una carpeta) `usuario:grupo` (cambia el dueño y el grupo al mismo tiempo, ej: `chown isocso:informatica archivo.txt`)                                          |
+| **chgrp**              | Change Group              | Cambia exclusivamente el grupo propietario de un archivo o directorio. | `-R` (recursivo: cambia el grupo de todo el contenido de una carpeta)                                                                                                                                                   |
+
+### Inciso C
+* La notación octal hace referencia a los permisos UGO-rwx (User, Group, Others y Read, Write, eXecute) del archivo. Esto se ve representado de la siguiente manera mediante un número octal:
+    * User – Group – Others
+    * 1 0 1 – 0 0 1 – 0 0 0
+    * r w x – r w x – r w x
+* En el ejemplo anterior, la notación pasada a octal sería 510 (se pasa cada secuencia de 3 bits de binario a octal: 101 -> 5, 001 -> 1, 000 -> 0).
+* En este caso, el usuario dueño puede leer y ejecutar el archivo, pero no escribirlo. El grupo dueño solo puede ejecutarlo, y el resto de usuarios o grupos no tienen permiso para nada.
+
+### Inciso D
+
+* Sí. El usuario *root* ignora totalmente los permisos de un archivo, y siempre puede ejecutar, leer y escribirlos.
+
+### Inciso E
+
+* Un path absoluto es una ruta completa hacia un archivo o directorio, que comienza desde el directorio base (/).
+* En cambio, un path relativo es aquel que comienza "desde donde estoy parado”. Desde ahí, si accedo a la carpeta “..” puedo retroceder al directorio anterior.
+
+### Inciso F
+
+* El comando para determinar en qué directorio se encuentra actualmente el usuario es `pwd` (*print working directory*).
+* Para acceder a tu directorio personal, se puede usar el comando `cd ~`.
+
+### Inciso G
+
+| **Nombre del comando** | **Significado en inglés** | **Funcionalidad**                                                                                                                                                                                                                                                                                                | **Parámetros (Ejemplos comunes)**                                                                                                             |
+| ---------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **mount**              | Mount                     | "Montar" un sistema de archivos. Le indica al Kernel que tome un dispositivo de bloque físico (como `/dev/sdb1` o un pendrive) y lo conecte lógicamente al árbol del sistema de archivos en una carpeta específica (punto de montaje). Si se ejecuta sin parámetros, lista todo lo que está montado actualmente. | `-t ext4` (especifica el tipo de sistema de archivos) `-o ro` (lo monta en modo Read-Only, solo lectura)                                      |
+| **umount**             | Unmount                   | "Desmontar". Desconecta de forma segura un sistema de archivos del árbol de directorios, asegurando que todos los datos en caché (páginas sucias) se vuelquen físicamente al disco antes de cortar el acceso.                                                                                                    | `-f` (fuerza el desmontaje, útil si un disco de red se desconectó) `-l` (*lazy*: desconecta lógicamente ahora, limpia después)                |
+| **du**                 | Disk Usage                | Mide el espacio en disco que está consumiendo un archivo o directorio específico. Es ideal para buscar qué carpetas (por ejemplo, dentro de tu `home`) te están llenando el disco duro.                                                                                                                          | `-s` (summary: muestra solo el total de la carpeta, sin detallar cada archivo dentro) `-h` (human-readable: muestra el tamaño en KB, MB o GB) |
+| **df**                 | Disk Free                 | Muestra la cantidad de espacio libre y usado de todos los sistemas de archivos (particiones) que están montados en el sistema en ese momento, en lugar de carpetas individuales.                                                                                                                                 | `-h` (human-readable: Muestra megas/gigas en lugar de bloques de 1K) `-i` (muestra el uso de inodos en lugar de bloques de datos)             |
+| **fdisk**              | Format Disk / Fixed Disk  | Es una herramienta interactiva para manipular la tabla de particiones de un disco físico (crear, borrar o cambiar el tipo de particiones). Históricamente se usa para el estándar MBR (para GPT suele usarse `gdisk` o `parted`).                                                                                | `-l` (lista todas las tablas de particiones de todos los discos conectados a la PC sin modificarlas)                                          |
+| **mkfs**               | Make File System          | Formatea una partición. Toma una partición física en blanco creada por `fdisk` (ej. `/dev/sdb1`) y le inyecta la estructura lógica de un sistema de archivos (bloques, superbloque, tabla de inodos) para que el SO pueda guardar archivos en ella.                                                              | `-t ext4 /dev/sdb1` (crea un sistema ext4 en sdb1). *Suele usarse con sus variantes directas como `mkfs.ext4` o `mkfs.vfat`*.                 |
+| **write**              | Write                     | (Nota: Este comando es de comunicación, no de discos). Permite enviar un mensaje de texto en tiempo real desde tu terminal hacia la terminal de otro usuario que esté logueado en el mismo sistema.                                                                                                              | `write usuario_destino` (abre un canal interactivo para escribir el mensaje). Termina con `Ctrl+D`.                                           |
+| **losetup**            | Loop Setup                | Asocia un archivo de imagen normal (ej. un `.iso` o un `.img` lleno de ceros) a un dispositivo "loop" lógico (ej. `/dev/loop0`). Esto permite que el kernel trate a ese archivo ordinario como si fuera un disco duro físico real para poder formatearlo o montarlo.                                             | `-f` (encuentra automáticamente el primer dispositivo loop libre y lo asocia al archivo indicado)                                             |
+| **stat**               | Status                    | Muestra el estado detallado y completo de un inodo. Imprime metadatos precisos sobre un archivo: su tamaño exacto en bytes, su número de inodo, sus permisos (en octal y texto), y las tres marcas de tiempo (Access, Modify, Change).                                                                           | `-c %a` (muestra únicamente los permisos en formato octal, útil para scripts)                                                                 |
 
 
 
