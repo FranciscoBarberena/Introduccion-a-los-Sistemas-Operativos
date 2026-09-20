@@ -25,7 +25,7 @@
     * No es *case-sensitive*.
     * Ambos son multiusuario, multitarea y multiprocesador. También puede administrar usuarios y permisos.
     * No es altamente portable. *Windows* solo se puede instalar en computadoras de uso general.
-    * *Windows* también permite instalar otros intérpretes de comandos. Aunque por defecto usa PowerShell* y cmd.
+    * *Windows* también permite instalar otros intérpretes de comandos. Aunque por defecto usa *PowerShell* y cmd.
     * No trata a todo como un archivo. Los dispositivos se administran en un menú separado.
     * Sus directorios son de uso general. 
 
@@ -650,7 +650,7 @@ getent group
 
 * Un proceso en *foreground*, significa que la *shell* no está aceptando nuevos comandos (se bloquea) mientras este se ejecuta. En cambio, un proceso en *background* puede continuar su ejecución mientras se envía un nuevo comando para ejecutar. Por ejemplo, si se ejecuta el comando *sleep* 10, durante 10 segundos se ejecutará en *foreground* el proceso *sleep*, y por eso no se aceptan nuevos comandos hasta que termine.
 
-## Inciso B
+### Inciso B
 
 * Para ejecutar un proceso en *background*, se le agrega el símbolo “&” al final. Por ejemplo: `sleep 10 &`.
 * Para traer un proceso del *background* al *foreground*, se ejecuta el comando `fg`. Esto trae el último proceso que se mandó al *background* y lo vuelve a poner en tu pantalla. Ejemplo:
@@ -701,13 +701,15 @@ getent group
 
 ## Punto 17
 
-## Inciso A
+### Inciso A
 * El concepto de empaquetar archivos en GNU/Linux es el proceso de tomar múltiples archivos y directorios, y pasarlos a un solo archivo con extensión `.tar`. Esto no reduce el tamaño del archivo en lo absoluto, simplemente agrupa distintos archivos en uno solo, llamado *tarball*
 
-## Inciso B
+### Inciso B
+
 * El tamaño es exactamente igual, justamente porque empaquetar archivos no reduce su tamaño total.
 
-## Inciso C
+### Inciso C
+
 * Para agrupar 4 archivos en uno solo se ejecuta este comando:
 ```
 tar -cf paquete.tar archivo1.txt archivo2.txt archivo3.txt archivo4.txt
@@ -717,6 +719,7 @@ tar -cf paquete.tar archivo1.txt archivo2.txt archivo3.txt archivo4.txt
 gzip paquete.tar
 ```
 ### Inciso D
+
 * Sí, se pueden hacer los 2 pasos del Inciso C simultáneamente con este comando:
 ```
 tar -czf archivo_final.tar.gz archivo1.txt archivo2.txt archivo3.txt archivo4.txt
@@ -731,5 +734,94 @@ tar -czf archivo_final.tar.gz archivo1.txt archivo2.txt archivo3.txt archivo4.tx
 | **zgrep**              | Compressed grep                 | Permite ejecutar el motor de búsqueda de `grep` directamente en el interior de archivos comprimidos (`.gz`). Lo hace en la memoria RAM, evitando que tengas que descomprimir el archivo en el disco.     | Acepta exactamente los mismos parámetros que grep (ej. `zgrep -i "error" log.gz`).                                                                                |
 | **wc**                 | Word Count                      | Analiza un archivo de texto (o el flujo de datos de otro comando) y cuenta la cantidad exacta de saltos de línea, palabras y bytes/caracteres que contiene.                                              | `-l` (imprime exclusivamente la cantidad de líneas), `-w` (cuenta solo palabras), `-c` (cuenta la cantidad de bytes).                                             |
 
+## Punto 18
+* `ls -l > prueba`
+    * Escribe la lista de archivos y directorios ubicados en el directorio actual (con detalles) en un archivo “prueba”. Si el archivo no existe, lo crea. Si existe, sobrescribe su contenido
+* `ps > PRUEBA`
+    * Escribe destructivamente la lista de procesos en ejecución en un archivo “PRUEBA”.
+    * Como *Linux* es *case-sensitive*, el archivo “PRUEBA” es totalmente diferente a “prueba”
+* `chmod 710 prueba`
+    * Modifica los permisos del archivo “prueba” de manera que:
+        * El usuario dueño tiene todos los permisos (lectura, escritura y ejecución) habilitados.
+        * Los usuarios del grupo dueño solo tienen permiso de ejecución
+        * Los usuarios que no son dueños, ni parte del grupo dueño, no pueden leer, escribir, ni ejecutar el archivo.
+    * Se puede ejecutar sin *root* si el usuario actual es el dueño del archivo.
+* `chown root:root PRUEBA`
+    * Este comando requiere permisos de *root*, por lo que no podría ejecutarse en el contexto de la consigna.
+    * Lo que está intentando hacer es cambiar el usuario y el grupo dueño del archivo “PRUEBA”, de tal manera que el usuario dueño sea el usuario *root*, y el grupo dueño sea el grupo *root*.
+* `chmod 777 PRUEBA`
+    * Modifica los permisos del archivo “PRUEBA” de manera que:
+        * Cualquier usuario de cualquier grupo puede leer, escribir y ejecutar el archivo.
+* `chmod 700 /etc/passwd`
+    * Este comando requiere permisos de *root*, por lo que no podría ejecutarse en el contexto de la consigna. Para poder ejecutar `chmod`, se debe estar logueado con el usuario dueño del archivo a modificar, pero el archivo `/etc/passwd` es propiedad del sistema.
+    * Lo que haría es modificar los permisos del archivo, de manera que:
+        * El usuario dueño tiene todos los permisos (lectura, escritura y ejecución) habilitados.
+        * El resto de usuarios no tienen ningún permiso habilitado.
+* `passwd root`
+    * Como cada usuario solo puede cambiar su propia contraseña, por lo que este comando requiere permisos de *root*
+    * Lo que está intentando hacer es iniciar el proceso interactivo para cambiar la contraseña del usuario *root*.
+* `rm PRUEBA`
+    * Elimina el archivo llamado “PRUEBA”
+* `man /etc/shadow`
+    * Este comando requiere permisos de *root*, porque el archivo `/etc/shadow` tiene restricciones en su acceso, y es propiedad del usuario *root*.
+    * Lo que haría es mostrar en pantalla el contenido del archivo `/etc/shadow`, que contiene los hashes de las contraseñas de todos los usuarios.
+* `find / −name ∗ .conf`
+    * Su sintaxis es incorrecta. Debería ser: `find / -name "*.conf"`
+    * Busca desde el directorio base, aquellos archivos cuyo nombre termina en `.conf`.
+* `usermod root −d /home/newroot −L`
+    * Este comando requiere permisos de *root*.
+    * Está intentando cambiar el home del usuario *root*, para que ahora sea `/home/newroot`. Además, el parámetro -L hace que la contraseña del usuario *root* ahora sea irreconocible, por lo que sería imposible entrar de nuevo siendo el usuario *root* (aunque todavía se puede entrar como otro usuario que tenga permisos de sudo).
+* `cd /root`
+    * Este comando requiere permisos de *root*.
+    * Está intentando posicionarse dentro de la carpeta `/root`
+* `rm *`
+    * Elimina todos los archivos del directorio actual (sin incluir los subdirectorios).
+* `cd /etc`
+    * Se posiciona dentro de la carpeta `/etc`.
+* `cp ∗ /home −R`
+    * Este comando requiere permisos de *root*, porque la carpeta destino `/home` tiene permisos 755 (111-101-101). Y para copiar algo, se necesitan permisos de escritura en el destino.
+    * Lo que haría es copiar todos los archivos y directorios (con subdirectorios incluidos, gracias al -R) de la ubicación actual, y pegarlos en `/home`.
+* `shutdown`
+    * Este comando requiere permisos de *root*.
+    * Lo que haría es programar que el sistema se apague en 1 minuto de manera segura.
 
+## Punto 19
+
+### Inciso A
+
+* `kill 23` o `kill -15 23`
+* Kill envía una señal al proceso 23. El -15 aclara que la señal es para la terminación. Como 15 es el valor por defecto, puede obviarse.
+
+### Inciso B
+
+* El proceso *init* o *systemd* tienen PID 1. Sin embargo, por cuestiones de seguridad, *Linux* no permite ejecutar el comando `kill 1`.
+
+### Inciso C
+
+* `find /home -name "*.conf*"`
+* Asumiendo que todos los archivos de usuario están dentro de `/home`.
+
+### Inciso D
+
+* `ps > /home/francisco/procesos`
+
+### Inciso E
+
+* `chmod /home/francisco/xxxx 751`
+
+### Inciso F
+
+* `chmod /home/francisco/yyyy 650`
+
+### Inciso G
+
+* `rm /tmp/*`
+
+### Inciso H
+
+* `sudo chown isocso /opt/isodata`
+
+### Inciso I
+
+* `pwd >> /home/francisco/donde`
 
