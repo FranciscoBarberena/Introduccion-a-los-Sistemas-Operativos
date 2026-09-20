@@ -18,7 +18,6 @@
 * Trata todo como un archivo. Los dispositivos se tratan como archivos en el directorio `/dev`.
 * Sus directorios tienen distintos propósitos asignados.
 
-
 ### Inciso B
 
 * Características de *Windows* en comparación con Linux:
@@ -52,8 +51,6 @@
 * POSIX (*Portable Operating System Interface*) es una familia de estándares creados por el IEEE. Su objetivo es lograr la compatibilidad entre distintos SO. 
 * Permite que el código fuente de un software desarrollado para un SO que respeta el estándar POSIX, sea compilable en cualquier otro sistema POSIX.
 * Muchos sistemas operativos actuales respetan este estándar, aunque algunos no en su totalidad. macOS lo respeta en su totalidad, mientras que Linux lo respeta parcialmente. En cambio, *Windows* no sigue a este estándar, aunque existen tecnologías que sirven para aumentar la compatibilidad de *Windows* con sistemas POSIX. 
-
-
 
 ## Punto 2
 
@@ -249,7 +246,6 @@ DUDA es lo mismo que cualquier otro SO (el arranque en Linux)?
 ### Inciso I
 * Sí, es posible, ya que hay gestores de arranque como GRUB que muestran un menú al ejecutarse. En este menú se encuentran los distintos archivos de arranque de cada SO instalado en una PC. 
 
-
 ## Punto 9
 
 ### Inciso A
@@ -297,7 +293,6 @@ Apretar Esc para entrar a modo normal. Guardar el archivo con el siguiente coman
 ls -l prueba.exe
 ```
 
-
 ### Inciso D
 
 * cat: su nombre viene de *concatenate*. Permite mostrar archivos de texto en la terminal con distintos formatos. Algunas de sus funciones son:
@@ -341,7 +336,7 @@ file prueba.exe
 | pwd | *print working directory* | Muestra la ruta absoluta del directorio actual. **Parámetros:** -P ignora enlaces simbólicos (los que crea `ln`), -L tiene en cuenta enlaces simbólicos. |
 | cp | *copy* | Copia un archivo con otro nombre en el mismo lugar, o con el mismo nombre en otro lugar. Ej: `cp archivo.txt nuevo_nombre.txt` o `cp archivo.txt /nueva/ubicacion/`. **Parámetros:** -i pregunta antes de sobreescribir, -v muestra el paso a paso. |
 | mv | *move* | Sirve para mover o renombrar archivos y directorios. Ejemplo para mover: `mv archivo.txt /home/usuario/documentos/`. Ejemplo para renombrar: `mv viejo.txt nuevo.txt` |
-| find | *find* | Sirve para buscar un archivo por distintos criterios (nombre, tamaño, tipo, fecha, etc). **Ejemplo:** `find . -size 54k` busca archivos de 54 kilobytes.|
+| find | *find* | Sirve para buscar un archivo por distintos criterios (nombre, tamaño, tipo, fecha, etc). **Ejemplo:** `find . -size 54k` busca archivos de 54 kilobytes. |
  
 ## Punto 11
 
@@ -606,11 +601,12 @@ getent group
 * Los permisos sobre un archivo se dividen entre permisos de lectura, escritura y ejecución. Dichos permisos se definen para el usuario dueño, para el grupo dueño, y para el resto del mundo.
 
 ### Inciso B
-| **Nombre del comando** | **Significado en inglés** | **Funcionalidad**                                                                                                                                                                                                                 | **Parámetros (Ejemplos comunes)**                                                                                                                                                                                       |
-| ---------------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **chmod**              | Change Mode               | Modifica los permisos de acceso (lectura `r`, escritura `w`, ejecución `x`) de un archivo o directorio. Puede usarse mediante notación octal (números) o simbólica (letras).                                                      | `-R` (recursivo: aplica los cambios a todos los archivos y subdirectorios dentro de una carpeta) `+x` (notación simbólica: añade permiso de ejecución) `755` (notación octal: rwx para el dueño, rx para grupo y otros) |
-| **chown**              | Change Owner              | Cambia el usuario propietario (dueño) de un archivo o directorio. También permite cambiar simultáneamente el grupo propietario.                                  | `-R` (recursivo: aplica el cambio de dueño a todo el contenido de una carpeta) `usuario:grupo` (cambia el dueño y el grupo al mismo tiempo, ej: `chown isocso:informatica archivo.txt`)                                          |
-| **chgrp**              | Change Group              | Cambia exclusivamente el grupo propietario de un archivo o directorio. | `-R` (recursivo: cambia el grupo de todo el contenido de una carpeta)                                                                                                                                                   |
+
+| **Nombre del comando** | **Significado en inglés** | **Funcionalidad** | **Parámetros (Ejemplos comunes)** |
+| :--- | :--- | :--- | :--- |
+| **chmod** | Change Mode | Modifica los permisos de acceso (lectura `r`, escritura `w`, ejecución `x`) de un archivo o directorio. Puede usarse mediante notación octal (números) o simbólica (letras). | `-R` (recursivo: aplica los cambios a todos los archivos y subdirectorios dentro de una carpeta) `+x` (notación simbólica: añade permiso de ejecución) `755` (notación octal: rwx para el dueño, rx para grupo y otros) |
+| **chown** | Change Owner | Cambia el usuario propietario (dueño) de un archivo o directorio. También permite cambiar simultáneamente el grupo propietario. | `-R` (recursivo: aplica el cambio de dueño a todo el contenido de una carpeta) `usuario:grupo` (cambia el dueño y el grupo al mismo tiempo, ej: `chown isocso:informatica archivo.txt`) |
+| **chgrp** | Change Group | Cambia exclusivamente el grupo propietario de un archivo o directorio. | `-R` (recursivo: cambia el grupo de todo el contenido de una carpeta) |
 
 ### Inciso C
 * La notación octal hace referencia a los permisos UGO-rwx (User, Group, Others y Read, Write, eXecute) del archivo. Esto se ve representado de la siguiente manera mediante un número octal:
@@ -648,6 +644,92 @@ getent group
 | **losetup**            | Loop Setup                | Asocia un archivo de imagen normal (ej. un `.iso` o un `.img` lleno de ceros) a un dispositivo "loop" lógico (ej. `/dev/loop0`). Esto permite que el kernel trate a ese archivo ordinario como si fuera un disco duro físico real para poder formatearlo o montarlo.                                             | `-f` (encuentra automáticamente el primer dispositivo loop libre y lo asocia al archivo indicado)                                             |
 | **stat**               | Status                    | Muestra el estado detallado y completo de un inodo. Imprime metadatos precisos sobre un archivo: su tamaño exacto en bytes, su número de inodo, sus permisos (en octal y texto), y las tres marcas de tiempo (Access, Modify, Change).                                                                           | `-c %a` (muestra únicamente los permisos en formato octal, útil para scripts)                                                                 |
 
+## Punto 16
+
+### Inciso A
+
+* Un proceso en *foreground*, significa que la *shell* no está aceptando nuevos comandos (se bloquea) mientras este se ejecuta. En cambio, un proceso en *background* puede continuar su ejecución mientras se envía un nuevo comando para ejecutar. Por ejemplo, si se ejecuta el comando *sleep* 10, durante 10 segundos se ejecutará en *foreground* el proceso *sleep*, y por eso no se aceptan nuevos comandos hasta que termine.
+
+## Inciso B
+
+* Para ejecutar un proceso en *background*, se le agrega el símbolo “&” al final. Por ejemplo: `sleep 10 &`.
+* Para traer un proceso del *background* al *foreground*, se ejecuta el comando `fg`. Esto trae el último proceso que se mandó al *background* y lo vuelve a poner en tu pantalla. Ejemplo:
+    * `sleep 20 &`
+    * `fg`
+* Para llevar un proceso del *foreground* al *background*, se hace lo siguiente:
+    * Ejecutar un comando en el foreground (ej: `sleep 20`)
+    * Detenerlo, apretando Ctrl + Z en la terminal
+    * Ejecutar el comando `bg`
+  
+### Inciso C
+
+* La finalidad del *pipe* (|) es comunicar procesos, conectando de forma directa la salida estándar (*stdout*) del comando de la izquierda con la entrada estándar (*stdin*) del comando de la derecha. Es decir, la salida del comando de la izquierda se convierte en la entrada del de la derecha. Por ejemplo:
+    * `ls -l /etc | grep "systemd"`.
+        * El primer comando tiene una salida que es una lista de directorios. En vez de que dicha salida vaya al monitor y se imprima en la terminal, el *pipe* hace que se convierta en la entrada del segundo comando.
+        * Como `grep "systemd"` sirve para filtrar texto, va a recibir la lista de directorios, dejando solo aquellos que contienen la palabra “systemd”. Luego, como no hay más *pipes*, la salida de este último comando se imprime en pantalla.
+
+### Inciso D
+
+* Cada proceso tiene 3 *stream* de texto plano. Uno de entrada (*standard input* o *stdin*) y 2 de salida: *standard output* (*stdout*) y *standard error* (*stderr*). Cada uno de estos *streams* tiene una fuente o un destino por defecto:
+    * *stdin* es la fuente de entrada para un comando, y por defecto, la recibe del teclado.
+    * *stdout* y *stderr* son fuentes de salida de un comando. La primera devuelve la salida esperada por el comando, y la segunda devuelve los mensajes de error, si es que hubo. Ambas, por defecto, se imprimen en el monitor.
+    * Cambiar la fuente por defecto de cualquiera de estos *streams*; es decir, hacer que *stdin* reciba el comando por algo que no sea el teclado, o hacer que *stdout* o *stderr* lleven su salida a algo que no sea el monitor, se llama *redirección*. El *pipe* es un ejemplo de redirección, ya que hace que la *stdout* de un proceso vaya a la entrada de otro, en vez de al monitor.
+* Estos 3 *streams* de datos tienen un número (*file descriptor*) asociado:
+    * *stdin* tiene el FD 0
+    * *stdout* tiene el FD 1
+    * *stderr* tiene el FD 2
+* Tipos de redirecciones:
+    * Redirección de *stdout* (FD 1)
+        * `>` redirecciona la salida estándar para llevarlo a un archivo en vez de imprimirlo en pantalla. Si el archivo no existe, lo crea. Si existe, borra todo su contenido y sobrescribe lo deseado. 
+            * **Ejemplo**: `ls -l > salida.txt`.
+        * `>>` funciona igual que el anterior, pero concatena en vez de sobrescribir. Es decir, si el archivo no existe, lo crea. Si ya existe, agrega la nueva salida al final del archivo sin tocar el contenido original
+            * **Ejemplo**: `ls -l >> salida.txt`
+    * Redirección de *stderr* (FD 2)
+        * Se pueden usar los operandos > y >>, precedidos por un 2.
+            * **Ejemplo**: `ls -l 2> errores.txt` o `ls -l 2>> listado.txt`
+    * Redirección de *stdout* y *stderr* combinadas
+        * Para guardar tanto la salida estándar como la de errores en un archivo, se puede modificar el comando de las siguientes maneras equivalentes entre sí:
+            * `ls -l > salida_y_errores.txt 2>&1`
+            * `ls -l &> salida_y_errores.txt`
+     * Si cualquier salida, ya sea *stdout* o *stderr*, se envía al dispositivo especial `/dev/null`, el kernel destruye la salida inmediatamente. Sirve para silenciar comandos que tienen salidas ruidosas
+         * **Ejemplo**: `comando_ruidoso 2> /dev/null` (El programa corre normalmente, pero todos los mensajes de error son destruidos en silencio para no ensuciar la pantalla)
+    * Redirección de *stdin* (FD 0)
+        * `<` Hace que la entrada sea el contenido directo de un archivo.
+            * **Ejemplo:** `wc -l < listado.txt`
+                * Sin el operando `<`, el programa `wc` recibe el nombre `listado.txt`, lo abre y se ejecuta
+                * Con el operando `<`, la *shell* abre el archivo `listado.txt`, toma todo el texto de ese archivo, y se lo manda a `wc` en forma de *stdin*. El programa `wc` nunca se entera el nombre del archivo
+
+## Punto 17
+
+## Inciso A
+* El concepto de empaquetar archivos en GNU/Linux es el proceso de tomar múltiples archivos y directorios, y pasarlos a un solo archivo con extensión `.tar`. Esto no reduce el tamaño del archivo en lo absoluto, simplemente agrupa distintos archivos en uno solo, llamado *tarball*
+
+## Inciso B
+* El tamaño es exactamente igual, justamente porque empaquetar archivos no reduce su tamaño total.
+
+## Inciso C
+* Para agrupar 4 archivos en uno solo se ejecuta este comando:
+```
+tar -cf paquete.tar archivo1.txt archivo2.txt archivo3.txt archivo4.txt
+```
+* Luego, para realmente comprimir ese archivo `paquete.tar`, y que ocupe menos espacio que los originales, se debe comprimir con el siguiente comando:
+```
+gzip paquete.tar
+```
+### Inciso D
+* Sí, se pueden hacer los 2 pasos del Inciso C simultáneamente con este comando:
+```
+tar -czf archivo_final.tar.gz archivo1.txt archivo2.txt archivo3.txt archivo4.txt
+```
+
+### Inciso E
+| **Nombre del comando** | **Significado en inglés**       | **Funcionalidad**                                                                                                                                                                                        | **Parámetros (Ejemplos comunes)**                                                                                                                                 |
+| ---------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **tar**                | Tape Archive                    | Agrupa (empaqueta) múltiples archivos y directorios en un solo archivo unificado (conocido como *tarball*). Originalmente diseñado para respaldos en cintas. Por sí solo no reduce el peso, solo agrupa. | `-c` (crea un empaquetado), `-x` (extrae), `-f` (indica el nombre del archivo), `-z` (comprime con gzip en el mismo paso, ej. `tar -czf`).                        |
+| **grep**               | Global Regular Expression Print | Filtra texto. Busca un patrón de caracteres o expresión regular dentro de uno o varios archivos, e imprime en la terminal únicamente las líneas que contienen coincidencias.                             | `-i` (ignora mayúsculas y minúsculas), `-v` (invierte la búsqueda, muestra las líneas que NO coinciden), `-r` (busca recursivamente dentro de carpetas).          |
+| **gzip**               | GNU zip                         | Comprime archivos individuales mediante el algoritmo DEFLATE para ahorrar espacio en disco. Por defecto, reemplaza el archivo original por uno nuevo con la extensión `.gz`.                             | `-d` (descomprime, logrando lo mismo que el comando `gunzip`), `-k` (keep: conserva el archivo original intacto sin borrarlo), `-9` (máximo nivel de compresión). |
+| **zgrep**              | Compressed grep                 | Permite ejecutar el motor de búsqueda de `grep` directamente en el interior de archivos comprimidos (`.gz`). Lo hace en la memoria RAM, evitando que tengas que descomprimir el archivo en el disco.     | Acepta exactamente los mismos parámetros que grep (ej. `zgrep -i "error" log.gz`).                                                                                |
+| **wc**                 | Word Count                      | Analiza un archivo de texto (o el flujo de datos de otro comando) y cuenta la cantidad exacta de saltos de línea, palabras y bytes/caracteres que contiene.                                              | `-l` (imprime exclusivamente la cantidad de líneas), `-w` (cuenta solo palabras), `-c` (cuenta la cantidad de bytes).                                             |
 
 
 
