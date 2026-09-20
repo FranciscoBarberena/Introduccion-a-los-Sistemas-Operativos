@@ -825,3 +825,71 @@ tar -czf archivo_final.tar.gz archivo1.txt archivo2.txt archivo3.txt archivo4.tx
 
 * `pwd >> /home/francisco/donde`
 
+## Punto 20
+
+### Inciso A
+
+* `su -`
+
+### Inciso B
+
+* `useradd -m fbarberena`
+* `passwd fbarberena`
+
+### Inciso C
+
+* Se modificaron los siguientes archivos:
+    * `/etc/passwd`
+        * Se agrega una nueva línea al final con: nombre de login, UID, GID, ruta del *home* y shell predeterminada.
+    * `/etc/shadow`
+        * Se agrega una nueva línea con el hash criptográfico de la contraseña asignada.
+    * `/etc/group`:
+        * Se añade una nueva línea creando un grupo privado para el usuario (con el mismo nombre, `fbarberena`) y se le asigna un número de GID.
+    * `/etc/gshadow`:
+        * Se modifica para gestionar las contraseñas y los administradores del nuevo grupo privado creado en el paso anterior.
+* Gracias al parámetro -m en *useradd*, se creó un directorio `/home/fbarberena`, que funciona como el nuevo *home* del usuario
+
+### Inciso D
+
+* `mkdir /tmp/miCursada`
+
+### Inciso E
+
+* `cp -r /var/log/* /tmp/miCursada`
+
+### Inciso F
+
+* `chown -R fbarberena:users /tmp/miCursada`
+
+### Inciso G
+
+* `chmod -R 723 /tmp/miCursada`
+
+### Inciso H
+
+* (En una venta nueva de la terminal)
+* `su - fbarberena`
+
+### Inciso I
+
+* `echo $0`
+
+### Inciso J
+
+* `ps aux | wc -l`
+
+### Inciso K
+
+* `who | wc -l`
+    * `who` devuelve una lista de las sesiones activas en el sistema. Luego, `wc -l` toma eso como entrada y cuenta las líneas, que equivale a la cantidad de sesiones.
+
+### Inciso L
+
+* `write fbarberena`
+    * Ingresar: Voy a apagar el servidor
+    * Presionar Ctrl + D.
+
+### Inciso M
+* `shutdown`
+
+
