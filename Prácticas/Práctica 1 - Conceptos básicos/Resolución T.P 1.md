@@ -338,6 +338,49 @@ file prueba.exe
 | mv | *move* | Sirve para mover o renombrar archivos y directorios. Ejemplo para mover: `mv archivo.txt /home/usuario/documentos/`. Ejemplo para renombrar: `mv viejo.txt nuevo.txt` |
 | find | *find* | Sirve para buscar un archivo por distintos criterios (nombre, tamaño, tipo, fecha, etc). **Ejemplo:** `find . -size 54k` busca archivos de 54 kilobytes. |
  
+## Punto 10
+
+### Inciso A
+
+* `mkdir ISOCSO`
+
+### Inciso B
+
+* `cd ISOCSO`
+
+### Inciso C
+
+* `touch isocso.txt`
+* `touch isocso.csv`
+
+### Inciso D
+
+* `ls`
+
+### Inciso E
+
+* `pwd`
+
+### Inciso F
+
+* `find . -iname "iso\*"`
+
+### Inciso G
+
+* `df -h`
+
+### Inciso H
+
+* `w`
+
+### Inciso I
+
+* `echo "Franciso Barberena" > isocso.txt`
+
+### Inciso J
+
+* `tail isocso.txt`
+
 ## Punto 11
 
 * man
@@ -867,7 +910,7 @@ tar -czf archivo_final.tar.gz archivo1.txt archivo2.txt archivo3.txt archivo4.tx
 
 ### Inciso H
 
-* (En una venta nueva de la terminal)
+* (En una ventana nueva de la terminal)
 * `su - fbarberena`
 
 ### Inciso I
@@ -892,4 +935,21 @@ tar -czf archivo_final.tar.gz archivo1.txt archivo2.txt archivo3.txt archivo4.tx
 ### Inciso M
 * `shutdown`
 
+## Punto 21
 
+### Inciso N
+
+* `mkdir "0273445"`
+* **Nota**: no se pueden crear carpetas con “/“.
+
+## Inciso O
+
+* `vim LEAME`
+* Entrar a modo *insert* apretando la tecla I.
+* Escribir nombre, apellido, número de alumno y dirección de correo electrónico, como si fuese un .txt normal (se puede usar el Enter para saltar de línea)
+* Apretar Esc para entrar a modo normal. Guardar el archivo con el siguiente comando:
+* `:wq`
+
+### Inciso P
+
+* `chmod `
