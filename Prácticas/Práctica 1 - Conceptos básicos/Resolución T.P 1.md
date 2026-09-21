@@ -77,6 +77,7 @@
     * El sistema ha sufrido controversias en relación al uso de servicios no libres, pero continúa siendo una de las distribuciones más usadas hoy en día.
 
 ## Punto 3
+
 ### Inciso A
 * Los componentes fundamentales de GNU/Linux son: el kernel, el *shell* y el *file system*.
 
@@ -87,6 +88,7 @@
     * **Shell**: es el intérprete de comandos. Dichos comandos pueden ser literales, en un shell con interfaz de consola (CLI) o pueden ser acciones del usuario en una interfaz gráfica (GUI).
 
 ## Punto 4
+
 ### Inciso A
 * Funciones principales del kernel:
     * Ejecutar programas y gestionar dispositivos.
@@ -101,15 +103,18 @@
 
 * Sí, es posible tener más de un kernel de GNU/Linux en la misma máquina. De la misma manera que el dual booting se puede usar para tener Linux y Windows en la misma PC, también podría usarse para tener Linux y una versión más vieja de Linux. En general, cuando el kernel se actualiza, no borra los archivos del kernel viejo, sino que ambos coexisten en el directorio `/boot/`.
 
-### Inciso C
+### Inciso 
+
 * Se encuentran en el directorio `/boot/`, y comienzan con la secuencia "vmlinuz-". Se puede ver todos las versiones de kernel que hay en una máquina Linux usando este comando en la terminal: `ls -lh /boot/vmlinuz-*`
 
 ## Punto 5
 
 ### Inciso A
+
 * El *shell*, consola o intérprete de comandos, es un programa que actúa como interfaz para comunicar al usuario con el sistema operativo. En una interfaz CLI, el usuario escribe un comando, el *shell* lo interpreta, y se lo entrega al SO para su ejecución. 
 
 ### Inciso B
+
 * Algunos *shells* de GNU/Linux son:
     * **Bourne Shell:** Ubicado en `/bin/sh`, está disponible en todas las versiones de UNIX y es lo suficientemente básico para que funcione en todas las plataformas.
     * **Bourne Again Shell o BASH:** Ubicado en `/bin/bash`, es uno de los *shells* más potentes y avanzados. Tiene licencia GNU. Algunas de sus funciones son:
@@ -191,7 +196,7 @@ grep "nombre_usuario" /etc/passwd | cut -d: -f7
 * DUDA distintos esquemas de particionamiento para distintos usos
 
 ### Inciso E
-* Sí, Linux puede leer las particiones que usan *file systems* propios de Windows como FAT o NTFS. Sin emabrgo, lo opuesto no es verdad, ya que *Windows* no puede leer particiones ext4.
+* Sí, Linux puede leer las particiones que usan *file systems* propios de Windows como FAT o NTFS. Sin embargo, lo opuesto no es verdad, ya que *Windows* no puede leer particiones ext4.
 
 ### Inciso F
 * Existen particionadores destructivos y no destructivos.
@@ -214,12 +219,13 @@ sector 1. Los primeros 446 bytes tienen instrucciones rudimentarias para que arr
 * Las siglas GPT significan *GUID Partition Table* y son el reemplazo de la tabla de particiones del MBR, eliminando la limitación de 4 particiones primarias. De cada partición se almacena el nombre y las coordenadas de inicio y fin.
 
 ### Inciso E
-* Una vez que la BIOS o UEFI terminó su ejecución, no se cargó el sistema operativo en sí. Lo que se cargó fue un gestor de arranque, que es un programa con más complejidad, con instrucciones para iniciar un SO. Con el estándar UEFI, se almacenan en una partición especial llamada ESP (*EFI System Partition*). En cambio, con el estándar BIOS, para que se inicialize el gestor de arranque, la información de su ejecución tiene que estar en el primer sector de la partición marcada como booteable. Algunos gestores de arranque son:
+* Una vez que la BIOS o UEFI terminó su ejecución, no se cargó el sistema operativo en sí. Lo que se cargó fue un gestor de arranque, que es un programa con más complejidad, con instrucciones para iniciar un SO. Con el estándar UEFI, se almacenan en una partición especial llamada ESP (*EFI System Partition*). En cambio, con el estándar BIOS, para inicializar el gestor de arranque, la información de su ejecución tiene que estar en el primer sector de la partición marcada como booteable. Algunos gestores de arranque son:
     * **GRUB:** es el estándar para Linux.
     * ***Windows Boot Manager:*** es el estándar en *Windows*.
 
 ### Inciso F
-DUDA preguntar esto porque es importante 
+DUDA preguntar esto porque es importante
+
 * Con estándar BIOS:
     * Se prende la computadora.
     * Se ejecuta el código ubicado en el cilindro 0, cabeza 0, sector 1 del disco. Aquí está el MBR.
@@ -249,6 +255,7 @@ DUDA es lo mismo que cualquier otro SO (el arranque en Linux)?
 ## Punto 9
 
 ### Inciso A
+
 * DUDA a que se refiere como se identifica a un archivo en Linux
 
 ### Inciso B
@@ -324,7 +331,7 @@ file prueba.exe
 
 * **Nota: se recomienda visualizar esta tabla en una pantalla ancha. Si aparece formateada de manera errónea, aquí hay un [link a la tabla en pdf](url).**
 
-| Nombre del comando | Significado | Comportamiento |
+| **Nombre** | **Significado en inglés** | **Comportamiento** |
 | --- | --- | --- |
 | cd | *change directory* | Sirve para entrar a un directorio. Ej: `cd documents` |
 | mkdir | *make directory* | Crea un directorio nuevo. Ej: `mkdir carpeta_a_crear` |
@@ -599,7 +606,7 @@ sudo groupadd informatica
 sudo usermod -aG informatica isocso
 ```
 
-5. Crear archivo (en /home/isocso)
+5. Crear archivo (en `/home/isocso`)
 ```
 touch test.txt
 ```
@@ -627,8 +634,8 @@ getent group
 ```
 
 ### Inciso E
-| **Nombre del comando** | **Significado en inglés**     | **Funcionalidad**                                                                                                                                                                                                | **Parámetros (Ejemplos comunes)**                                                                                         |
-| ---------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **Nombre** | **Significado en inglés** | **Funcionalidad** | **Parámetros** |
+|-------------------|-------------------------|--------------------------|-------------------|
 | **useradd**            | User Add                      | Comando de bajo nivel para crear un nuevo usuario. Por defecto, solo crea la entrada en `/etc/passwd` sin configurar carpeta home, contraseña ni shell (depende de la configuración de la distribución).         | `-m` (crea el directorio home) `-s /bin/bash` (define la shell) `-g grupo` (define grupo principal)                       |
 | **adduser**            | Add User                      | Interfaz de alto nivel y amigable para `useradd` (muy común en Debian/Ubuntu). Es interactivo: te pregunta paso a paso la contraseña, nombre real y crea automáticamente el directorio home y los archivos base. | `--system` (crea un usuario de sistema sin home ni shell interactiva)                                                     |
 | **usermod**            | User Modify                   | Modifica las propiedades de una cuenta de usuario ya existente (cambia su home, su shell, su nombre de login, o sus grupos).                                                                                     | `-aG grupo` (agrega el usuario a un grupo suplementario sin borrar los anteriores) `-d /nueva/ruta` (cambia el home)      |
@@ -645,7 +652,7 @@ getent group
 
 ### Inciso B
 
-| **Nombre del comando** | **Significado en inglés** | **Funcionalidad** | **Parámetros (Ejemplos comunes)** |
+| **Nombre** | **Significado en inglés** | **Funcionalidad** | **Parámetros (Ejemplos comunes)** |
 | :--- | :--- | :--- | :--- |
 | **chmod** | Change Mode | Modifica los permisos de acceso (lectura `r`, escritura `w`, ejecución `x`) de un archivo o directorio. Puede usarse mediante notación octal (números) o simbólica (letras). | `-R` (recursivo: aplica los cambios a todos los archivos y subdirectorios dentro de una carpeta) `+x` (notación simbólica: añade permiso de ejecución) `755` (notación octal: rwx para el dueño, rx para grupo y otros) |
 | **chown** | Change Owner | Cambia el usuario propietario (dueño) de un archivo o directorio. También permite cambiar simultáneamente el grupo propietario. | `-R` (recursivo: aplica el cambio de dueño a todo el contenido de una carpeta) `usuario:grupo` (cambia el dueño y el grupo al mismo tiempo, ej: `chown isocso:informatica archivo.txt`) |
@@ -675,8 +682,8 @@ getent group
 
 ### Inciso G
 
-| **Nombre del comando** | **Significado en inglés** | **Funcionalidad**                                                                                                                                                                                                                                                                                                | **Parámetros (Ejemplos comunes)**                                                                                                             |
-| ---------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Nombre** | **Significado en inglés** | **Funcionalidad** | **Parámetros** |
+|-------------------|-------------------------|--------------------------|-------------------|
 | **mount**              | Mount                     | "Montar" un sistema de archivos. Le indica al Kernel que tome un dispositivo de bloque físico (como `/dev/sdb1` o un pendrive) y lo conecte lógicamente al árbol del sistema de archivos en una carpeta específica (punto de montaje). Si se ejecuta sin parámetros, lista todo lo que está montado actualmente. | `-t ext4` (especifica el tipo de sistema de archivos) `-o ro` (lo monta en modo Read-Only, solo lectura)                                      |
 | **umount**             | Unmount                   | "Desmontar". Desconecta de forma segura un sistema de archivos del árbol de directorios, asegurando que todos los datos en caché (páginas sucias) se vuelquen físicamente al disco antes de cortar el acceso.                                                                                                    | `-f` (fuerza el desmontaje, útil si un disco de red se desconectó) `-l` (*lazy*: desconecta lógicamente ahora, limpia después)                |
 | **du**                 | Disk Usage                | Mide el espacio en disco que está consumiendo un archivo o directorio específico. Es ideal para buscar qué carpetas (por ejemplo, dentro de tu `home`) te están llenando el disco duro.                                                                                                                          | `-s` (summary: muestra solo el total de la carpeta, sin detallar cada archivo dentro) `-h` (human-readable: muestra el tamaño en KB, MB o GB) |
@@ -721,26 +728,26 @@ getent group
     * *stdin* tiene el FD 0
     * *stdout* tiene el FD 1
     * *stderr* tiene el FD 2
-* Tipos de redirecciones:
-    * Redirección de *stdout* (FD 1)
-        * `>` redirecciona la salida estándar para llevarlo a un archivo en vez de imprimirlo en pantalla. Si el archivo no existe, lo crea. Si existe, borra todo su contenido y sobrescribe lo deseado. 
-            * **Ejemplo**: `ls -l > salida.txt`.
-        * `>>` funciona igual que el anterior, pero concatena en vez de sobrescribir. Es decir, si el archivo no existe, lo crea. Si ya existe, agrega la nueva salida al final del archivo sin tocar el contenido original
-            * **Ejemplo**: `ls -l >> salida.txt`
-    * Redirección de *stderr* (FD 2)
-        * Se pueden usar los operandos > y >>, precedidos por un 2.
-            * **Ejemplo**: `ls -l 2> errores.txt` o `ls -l 2>> listado.txt`
-    * Redirección de *stdout* y *stderr* combinadas
-        * Para guardar tanto la salida estándar como la de errores en un archivo, se puede modificar el comando de las siguientes maneras equivalentes entre sí:
-            * `ls -l > salida_y_errores.txt 2>&1`
-            * `ls -l &> salida_y_errores.txt`
-     * Si cualquier salida, ya sea *stdout* o *stderr*, se envía al dispositivo especial `/dev/null`, el kernel destruye la salida inmediatamente. Sirve para silenciar comandos que tienen salidas ruidosas
-         * **Ejemplo**: `comando_ruidoso 2> /dev/null` (El programa corre normalmente, pero todos los mensajes de error son destruidos en silencio para no ensuciar la pantalla)
-    * Redirección de *stdin* (FD 0)
-        * `<` Hace que la entrada sea el contenido directo de un archivo.
-            * **Ejemplo:** `wc -l < listado.txt`
-                * Sin el operando `<`, el programa `wc` recibe el nombre `listado.txt`, lo abre y se ejecuta
-                * Con el operando `<`, la *shell* abre el archivo `listado.txt`, toma todo el texto de ese archivo, y se lo manda a `wc` en forma de *stdin*. El programa `wc` nunca se entera el nombre del archivo
+* Hay distintos tipos de redirecciones: 
+* Redirección de *stdout* (FD 1)
+    * `>` redirecciona la salida estándar para llevarlo a un archivo en vez de imprimirlo en pantalla. Si el archivo no existe, lo crea. Si existe, borra todo su contenido y sobrescribe lo deseado. 
+        * **Ejemplo**: `ls -l > salida.txt`.
+    * `>>` funciona igual que el anterior, pero concatena en vez de sobrescribir. Es decir, si el archivo no existe, lo crea. Si ya existe, agrega la nueva salida al final del archivo sin tocar el contenido original
+        * **Ejemplo**: `ls -l >> salida.txt`
+* Redirección de *stderr* (FD 2)
+    * Se pueden usar los operandos > y >>, precedidos por un 2.
+        * **Ejemplo**: `ls -l 2> errores.txt` o `ls -l 2>> listado.txt`
+* Redirección de *stdout* y *stderr* combinadas
+    * Para guardar tanto la salida estándar como la de errores en un archivo, se puede modificar el comando de las siguientes maneras equivalentes entre sí:
+        * `ls -l > salida_y_errores.txt 2>&1`
+        * `ls -l &> salida_y_errores.txt`
+* Si cualquier salida, ya sea *stdout* o *stderr*, se envía al dispositivo especial `/dev/null`, el kernel destruye la salida inmediatamente. Sirve para silenciar comandos que tienen salidas ruidosas
+     * **Ejemplo**: `comando_ruidoso 2> /dev/null` (El programa corre normalmente, pero todos los mensajes de error son destruidos en silencio para no ensuciar la pantalla)
+* Redirección de *stdin* (FD 0)
+    * `<` Hace que la entrada sea el contenido directo de un archivo.
+        * **Ejemplo:** `wc -l < listado.txt`
+        * Sin el operando `<`, el programa `wc` recibe el nombre `listado.txt`, lo abre y se ejecuta
+        * Con el operando `<`, la *shell* abre el archivo `listado.txt`, toma todo el texto de ese archivo, y se lo manda a `wc` en forma de *stdin*. El programa `wc` nunca se entera el nombre del archivo
 
 ## Punto 17
 
@@ -769,8 +776,8 @@ tar -czf archivo_final.tar.gz archivo1.txt archivo2.txt archivo3.txt archivo4.tx
 ```
 
 ### Inciso E
-| **Nombre del comando** | **Significado en inglés**       | **Funcionalidad**                                                                                                                                                                                        | **Parámetros (Ejemplos comunes)**                                                                                                                                 |
-| ---------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Nombre** | **Significado en inglés** | **Funcionalidad** | **Parámetros** |
+|-------------------|-------------------------|--------------------------|-------------------|
 | **tar**                | Tape Archive                    | Agrupa (empaqueta) múltiples archivos y directorios en un solo archivo unificado (conocido como *tarball*). Originalmente diseñado para respaldos en cintas. Por sí solo no reduce el peso, solo agrupa. | `-c` (crea un empaquetado), `-x` (extrae), `-f` (indica el nombre del archivo), `-z` (comprime con gzip en el mismo paso, ej. `tar -czf`).                        |
 | **grep**               | Global Regular Expression Print | Filtra texto. Busca un patrón de caracteres o expresión regular dentro de uno o varios archivos, e imprime en la terminal únicamente las líneas que contienen coincidencias.                             | `-i` (ignora mayúsculas y minúsculas), `-v` (invierte la búsqueda, muestra las líneas que NO coinciden), `-r` (busca recursivamente dentro de carpetas).          |
 | **gzip**               | GNU zip                         | Comprime archivos individuales mediante el algoritmo DEFLATE para ahorrar espacio en disco. Por defecto, reemplaza el archivo original por uno nuevo con la extensión `.gz`.                             | `-d` (descomprime, logrando lo mismo que el comando `gunzip`), `-k` (keep: conserva el archivo original intacto sin borrarlo), `-9` (máximo nivel de compresión). |
@@ -808,10 +815,10 @@ tar -czf archivo_final.tar.gz archivo1.txt archivo2.txt archivo3.txt archivo4.tx
 * `man /etc/shadow`
     * Este comando requiere permisos de *root*, porque el archivo `/etc/shadow` tiene restricciones en su acceso, y es propiedad del usuario *root*.
     * Lo que haría es mostrar en pantalla el contenido del archivo `/etc/shadow`, que contiene los hashes de las contraseñas de todos los usuarios.
-* `find / −name ∗ .conf`
+* `find / -name ∗ .conf`
     * Su sintaxis es incorrecta. Debería ser: `find / -name "*.conf"`
     * Busca desde el directorio base, aquellos archivos cuyo nombre termina en `.conf`.
-* `usermod root −d /home/newroot −L`
+* `usermod root -d /home/newroot -L`
     * Este comando requiere permisos de *root*.
     * Está intentando cambiar el home del usuario *root*, para que ahora sea `/home/newroot`. Además, el parámetro -L hace que la contraseña del usuario *root* ahora sea irreconocible, por lo que sería imposible entrar de nuevo siendo el usuario *root* (aunque todavía se puede entrar como otro usuario que tenga permisos de sudo).
 * `cd /root`
@@ -821,7 +828,7 @@ tar -czf archivo_final.tar.gz archivo1.txt archivo2.txt archivo3.txt archivo4.tx
     * Elimina todos los archivos del directorio actual (sin incluir los subdirectorios).
 * `cd /etc`
     * Se posiciona dentro de la carpeta `/etc`.
-* `cp ∗ /home −R`
+* `cp ∗ /home -R`
     * Este comando requiere permisos de *root*, porque la carpeta destino `/home` tiene permisos 755 (111-101-101). Y para copiar algo, se necesitan permisos de escritura en el destino.
     * Lo que haría es copiar todos los archivos y directorios (con subdirectorios incluidos, gracias al -R) de la ubicación actual, y pegarlos en `/home`.
 * `shutdown`
@@ -942,7 +949,7 @@ tar -czf archivo_final.tar.gz archivo1.txt archivo2.txt archivo3.txt archivo4.tx
 * `mkdir "0273445"`
 * **Nota**: no se pueden crear carpetas con “/“.
 
-## Inciso O
+### Inciso O
 
 * `vim LEAME`
 * Entrar a modo *insert* apretando la tecla I.
@@ -952,4 +959,126 @@ tar -czf archivo_final.tar.gz archivo1.txt archivo2.txt archivo3.txt archivo4.tx
 
 ### Inciso P
 
-* `chmod `
+* `chmod 017 /home/francisco/LEAME`
+
+### Inciso Q
+
+* `ls > /home/francisco/leame`
+* Es posible porque *Linux* es *case-sensitive*, “leame” es un archivo totalmente distinto a “LEAME”
+
+### Inciso R
+
+* Para localizar un archivo dentro del *file system*, usaría el comando *locate*, ya que utiliza una base de datos interna indexada con todos los nombres de los archivos, lo que es más rápido que buscar directorio por directorio.
+* Sin embargo, *locate* solo permite buscar por nombre. Si quisiera localizar varios archivos con características similares, usaría el comando *find*, que es más lento pero permite buscar por otros criterios además del nombre (tamaño, fecha de modificación, permisos, o usuario dueño).
+
+### Inciso S
+
+* `locate "*.so" > /home/francisco/0273445/ejercicioF`
+* **Nota**: si prueban esto con `find / -name "*.so"`, se van a dar cuenta que la diferencia en velocidad mencionada en el inciso R es significativa.
+
+## Punto 22
+
+* Estas corresponden a las anotaciones del archivo `explicacion_de_ejercicio`, creado originalmente en Vim.
+* **Nota**: hay comandos con más de una parte, por eso algunos tienen un número entre paréntesis antes de la explicación.
+1. Crea una carpeta llamada `iso`.
+2. (1) Entra a la carpeta `iso`.
+2. (2) Ejecuta el comando `ps`, y escribe su salida en un archivo llamado f0, sobrescribiendo su contenido.
+3. Lista todo el contenido dentro del directorio "iso", y vuelca ese listado en un archivo llamado f1, sobrescribiendo su contenido.
+4. Se posiciona en el directorio raíz.
+5. Imprime el directorio asignado como personal del usuario actual (ej: /home/francisco).
+6. (*Asumo que el comando pretendía ser `ls -l > $HOME/iso/ls`*) Lista detalladamente todos los archivos del directorio actual (/). Luego, vuelca ese contenido en un archivo llamado ls de manera destructiva. Dicho archivo se crea/encuentra dentro de la carpeta iso creada previamente en el *home* del usuario.
+7. (1) Se posiciona en el directorio *home* del usuario.
+7. (2) Crea una carpeta llamada `f2`.
+8. Lista de manera detallada los permisos, dueño, etc de la carpeta f2 (no de sus archivos o subdirectorios). Esto es debido al parámetro -d (*directory*).
+9. Cambia los permisos de f2, de manera que: el usuario dueño puede escribir y ejecutar, el grupo dueño puede leer su contenido, y cualquier otro usuario solo puede ejecutarlo.
+10. Crea un archivo vacío llamado `dir`.
+11. Entra a la carpeta f2.
+12. Vuelve al home, y entra a la carpeta iso.
+13. Imprime el directorio actual (/home/francisco/iso) en un nuevo archivo llamado f3, de forma destructiva.
+14. (1) Imprime todos los procesos en ejecución en la terminal actual.
+14. (2) Recibe la salida de 14.1, y devuelve solamente aquellas líneas que contienen la palabra `ps`.
+14. (3) Recibe la salida de 14.2, y devuelve cuántas líneas tiene (1).
+14. (4) Vuelca la salida de 14.3 en un archivo llamado f3 de manera no destructiva. Dicho archivo se encuentra en /home/francisco/f2. Esto es posible sin acceso a *root*, porque previamente definimos que el usuario dueño tiene permisos de escritura sobre el directorio f2.
+15. (1) Actualiza los permisos del directorio f2, para que el usuario dueño tenga acceso total, y el resto de usuarios no tengan ningún permiso.
+15. (2) Retrocede al *home* del usuario.
+16. Busca, desde el home del usuario, un archivo cuyo nombre sea `etc/passwd`. Sin embargo, ningún archivo puede tener ese nombre. Para buscar por nombre completo (con ubicación incluida), se debe usar el parámetro `-wholename`.
+17. Lo mismo que en el 16 pero iniciando desde el directorio raíz.
+18. Crea una carpeta llamada ejercicio5.
+19. Asumo que "el directorio creado en 24a" se refiere a la carpeta creada en el inciso 18, llamada "ejercicio5". El comando para hacer eso sería: `cp -r /home/francisco/iso /home/francisco/ejercicio5`.
+20. Los archivos restantes son: dir, ejercicioF, leame, LEAME y el directorio f2. Para copiar los archivos y directorios se usa:
+    * `cp dir ejercicioF leame LEAME f2 /home/francisco/ejercicio5`.
+
+## Punto 23
+
+* Para crear el esquema de directorios, ejecute en la terminal el archivo crearEsquema23.sh.
+
+### Inciso A
+
+* `mv dir1/f3 ~`
+
+### Inciso B
+
+* `cp dir2/f4 dir1/dir11`
+
+### Inciso C
+
+* `cp dir2/f4 dir1/dir11/f7`
+
+### Inciso D
+
+* `mkdir copia; cp -r  dir1/* copia`
+
+### Inciso E
+
+* `mv f1 archivo; ls -l archivo`
+
+### Inciso F
+
+* `chmod 617 archivo`
+
+### Inciso G
+
+* `rename 's/$/.exe/' f3 dir2/f4`
+* Lo que hace el comando *rename* es:
+    * `s/buscar_esto/reemplazar_con_esto/` archivo1 archivo2 archivo3.
+    * La s significa sustitución.
+    * El $ significa “El punto final del archivo”
+
+### Inciso H
+
+* `chmod 023 f3.exe dir2/f4.exe`
+
+## Punto 24
+
+### Inciso A
+
+* `mkdir /tmp/logs`
+
+### Inciso B
+
+* `cp -r /var/log/* /tmp/logs`
+
+### Inciso C
+
+* `tar -cf misLogs.tar /tmp/logs`
+
+### Inciso D
+
+* `tar -czf misLogs.tar.gz /tmp/logs`
+
+### Inciso E
+
+* *En realidad ya estarían almacenados en el directorio personal del usuario*
+* `cp misLogs.tar misLogs.tar.gz ~`
+
+### Inciso F
+
+* `rm -r /tmp/logs`
+
+### Inciso G
+
+* `mkdir desempaquete1; tar -xf misLogs.tar -C ~/desempaquete1`
+* `mkdir desempaquete2; tar -xzf misLogs.tar.gz -C ~/desempaquete2`
+* La flag -C sirve para cambiar el directorio en donde se extrae.
+
+
