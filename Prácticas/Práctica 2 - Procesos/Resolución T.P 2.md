@@ -73,3 +73,37 @@
 ### Inciso C
 
 * Sí, la solución se denomina *aging*, y consiste en subirle la prioridad a los procesos que han estado mucho tiempo en la cola de listo sin ejecutarse.
+
+## Punto 8
+
+### Inciso A
+
+* En el Round Robin, el problema surge con los procesos *I/O bound*. Cuando se tiene en situaciones como la siguiente:
+    * Quantum = 10
+    * Proceso 4 necesita hacer 1U de CPU, esperar una I/O, y luego hacer los otros 9U
+    * Cuando el proceso 4 es elegido por el planificador de la cola ready, se le asigna un quantum de 10 (como a todos los procesos). Sin embargo, luego de usar 1U de CPU, debe esperar la I/O, y cuando termine de eso, va a volver **al final de la cola circular del round robin**. Esto significa que hubo 9U del quantum las cuales el proceso no pudo usar.
+
+### Inciso B
+
+* En el SRTF, el problema surge con los procesos con alto uso de CPU (*CPU bound*)
+* Como el algoritmo selecciona al proceso cuya próxima ráfaga de CPU sea la más corta, los proceso que hacen un uso intensivo de la CPU se ven perjudicados. En un ejemplo extremo, un proceso que dura 50U y usa exclusivamente CPU, va a tener su próxima ráfaga con un valor de 50. Al ser un valor alto, es probable que el algoritmo nunca elija al proceso para que sea asignado a la CPU (o tarde mucho en hacerlo). Además, como el algoritmo es apropiativo, es probable que una vez que sea elegido, sea rápidamente expulsado por el sistema operativo.
+
+## Punto 10
+
+* Una de las maneras de que el quantum nunca llegue a 0 con un sistema VRR, es que el proceso termine por completo luego de usar una cantidad de ciclos de CPU que sea menor al quantum. Por ejemplo:
+    * Se le asigna *quantum* de 10U al proceso 4, que necesita 7U de CPU para su ejecución completa.
+    * El proceso 4 usa 2U de CPU.
+    * Necesita I/O, la usa y luego va a la cola auxiliar.
+    * Vuelve a la CPU.
+    * Usa 5U de CPU, quedó con un quantum de 3.
+    * Listo, el proceso terminó y su *quantum* no llegó a 0.
+    * Si el proceso del ejemplo anterior necesitase de 11U para terminar, esto ya no aplicaría. En algún momento va a volver de la cola auxiliar, y va a agotar su quantum por completo. Le va a quedar 1U pendiente cuando vuelva a la cola estándar.
+* Otra manera, teniendo en cuenta la interrupción por *clock* mencionada en el enunciado, es la siguiente
+    * El sistema operativo decrementa el *quantum* cada tick de reloj, que sucede cada cierta unidad de tiempo, por ejemplo 10ms.
+    * El proceso 4 es elegido para usar la CPU, se le asigna un *quantum* de 10
+    * Usa la CPU por 8ms
+        * Como no pasaron los 10ms necesarios para un tick del reloj, su *quantum* nunca se decrementó, sigue en 10.
+    * Pide una I/O
+    * Termina la I/O y vuelve a la cola auxiliar. Sigue teniendo el *quantum* en 10.
+    * Es elegido para la CPU, se le asigna su quantum restante, que sigue siendo 10.
+    * Esto podría repetirse y que el *quantum* nunca llegue a 0.
