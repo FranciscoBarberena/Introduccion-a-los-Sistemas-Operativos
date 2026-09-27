@@ -107,3 +107,96 @@
     * Termina la I/O y vuelve a la cola auxiliar. Sigue teniendo el *quantum* en 10.
     * Es elegido para la CPU, se le asigna su quantum restante, que sigue siendo 10.
     * Esto podría repetirse y que el *quantum* nunca llegue a 0.
+
+## Punto 15
+
+* Para la situación planteada, la solución sería un esquema de colas multinivel. Este tendría:
+
+## Punto 16
+
+### Inciso A
+
+* Asumiendo que el más corto primero se refiere al tiempo total del job (y no el de la próxima ráfaga, como hacen los algoritmos SJF y SRTF), esto beneficia a los procesos cortos, ya sea acotados por CPU o E/S.
+
+### Inciso B
+
+* Esto describe un sistema similar al Virtual Round Robin, que beneficia notoriamente a cualquier proceso *I/O bound*, ya sea corto o largo.
+
+### Punto 17
+
+* Si el *quantum* en *Round-Robin* se incrementa sin límite, el algoritmo de planificación se aproxima a FIFO. Esto sucede porque, con el algoritmo RR, un proceso puede dejar la CPU por alguno de estos 2 motivos:
+    * Lo dejó voluntariamente (necesita E/S o terminó)
+    * Fue expulsado por el algoritmo (**Se agotó su quantum**)
+* El segundo motivo, en el que se agota el *quantum*, jamás va a suceder con un *quantum* exageradamente largo. De esta manera, si el algoritmo nunca es expulsado, va a usar la CPU hasta dejarla voluntariamente, y luego va a venir el siguiente en la cola circular. Esto es exactamente lo mismo que sucede en el algoritmo FIFO o FCFS.
+
+## Punto 18
+
+### Inciso A
+
+* El padre imprime:
+    * “hola”
+* El hijo imprime:
+    * La salida estándar de *ls*
+
+### Inciso B
+
+* El padre imprime:
+    * “hola”
+    * La salida estándar de *ls*
+* El hijo imprime:
+    * La salida estándar de *ps*
+ 
+### Inciso C
+
+* El padre imprime:
+    * “Anda a rendir el Primer Parcial de Promo!”
+    * “¿Como te fue?”
+* El hijo imprime:
+    * “Estoy comenzando el Examen”
+    * Salida estándar de *ps*
+
+## Punto 19
+
+### Inciso A
+
+* Aparecen 8 líneas impresas con la palabra “Proceso”.
+
+### Inciso B
+
+* Sí, el número de líneas es el número de procesos que han estado en ejecución. El código se ejecuta de la siguiente manera:
+    * El padre genera 3 hijos, 1 en cada iteración.
+        * El hijo 1 se crea con 2 iteraciones restantes, por lo que genera 2 hijos más (nietos). El primero de estos nietos se genera con una iteración restante, por lo que genera un bisnieto.
+        * El hijo 2 se crea con una iteración restante, por lo que genera 1 nieto más
+        * El hijo 3 se genera en la última iteración, por lo que no genera nietos.
+* En total, se crearon 8 procesos ($2^3$) (1 padre + 3 hijos + 3 nietos + 1 bisnieto).
+
+## Punto 20
+
+### Incisos A, B y C
+
+* Todas las líneas tienen el mismo valor, ya que todos los hijos copian el valor de *p = 0* que tiene el padre. Este es luego incrementado una única vez a 1, y se imprime.
+
+### Inciso D
+
+* La única manera de cambiar el valor que imprime cada proceso, por ejemplo, indicando su nivel de jerarquía (padre, hijo, nieto, bisnieto) es revisando el valor de PID que devuelve *fork()*. Se vería algo así:
+```
+\#include \<stdio.h>
+\#include \<unistd.h>
+\#include \<sys/types.h>
+
+int main(void) {
+    int c;
+    pid\_t pid;
+    int p = 0;
+    printf("Comienzo\n");
+    for (c = 0; c < 3; c++) {
+        pid = fork();
+        if (pid == 0){
+            p++;
+        }
+    }
+    printf(" Proceso %d\n ",p);
+    return 0;
+}
+
+```
