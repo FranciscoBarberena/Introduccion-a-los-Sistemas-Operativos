@@ -98,15 +98,15 @@ while (true)
 * El programa llama al *wrapper* como a cualquier otra función. Ej: `read(fd, buffer, n)`
 * Para que el *wrapper* pueda hacer la *system call*, necesita pasarle al kernel un parámetro que le diga *qué system call está llamando*. Esto lo hace mediante un número, ya que hay una tabla que une a cada system call con un número identificador.
     * El *wrapper* envía como parámetro/s al kernel tanto el identificador como los parámetros de la función misma `(fd, buffer, n)`. Este pasaje se puede hacer mediante registros, mediante un bloque de memoria cuya dirección va en un registro, o mediante la pila. El *wrapper* se encarga de que los parámetros estén donde el kernel los espera.
-* El *wrapper* ejecuta una instrucción especial (NO PRIVILEGIADA). Esto genera un *trap*, que es una excepción, y hace que se pase a modo kernel
+* El *wrapper* ejecuta una instrucción especial (**NO PRIVILEGIADA**). Esto genera un *trap*, que es una excepción, y hace que se pase a modo kernel
 
 #### Fase 2 (hardware)
 
 * El CPU pasa de modo usuario a modo kernel
 * El CPU guarda la dirección de retorno y el **PSW**.
-        * Dependiendo de la arquitectura, pueden guardarse en registros o en la pila del kernel.
+    * Dependiendo de la arquitectura, pueden guardarse en registros o en la pila del kernel.
 * El CPU guarda en PC un punto de entrada fijo, para que la próxima instrucción a ejecutar sea código del kernel.
-    * **Nota**: el punto de entrada es el mismo para todas las system calls. Una vez que se empiece a ejecutar el código del kernel, él será el responsable de revisar el parámetro con el número de system call, para decidir qué subrutina ejecutar. El hardware se abstrae de todo eso y solamente carga el punto de entrada fijo para todas las *system calls*
+    * *Nota*: el punto de entrada es el mismo para todas las system calls. Una vez que se empiece a ejecutar el código del kernel, él será el responsable de revisar el parámetro con el número de system call, para decidir qué subrutina ejecutar. El hardware se abstrae de todo eso y solamente carga el punto de entrada fijo para todas las *system calls*
 
 #### Fase 3 (atención en el kernel)
 
@@ -136,10 +136,51 @@ while (true)
 * El hardware restaura el PC y el PSW, y vuelve a Modo Usuario.
 * El *wrapper* interpreta el resultado del Kernel
     * Si hubo error, guarda el código en `errno` y devuelve -1.
-    * Si no, devuelve el resultado de la system call (bytes leídos, PID, etc.).
+    * Si no, devuelve el resultado de la system call (bytes leídos, PID, etc).
   
+## Cambio de contexto
 
-    
+* Un cambio de contexto (*context switch*) sucede cuando en la CPU se está ejecutando un proceso A, pero se decide cederle la CPU a otro proceso B, guardando el estado de A para retomarlo después.
+
+### Fase 1 (realizada por el *hardware*)
+
+* Sucede una interrupción de clock, dándole control al kernel.
+* Al finalizar la instrucción en curso, la CPU verifica si hay interrupciones pendientes y habilitadas.
+    * Hace esto porque la instrucción en ejecución al momento de la interrupción nunca puede quedar a medias.
+* El CPU pasa a modo kernel
+* El CPU deja la pila del usuario y pasa a la pila del kernel.
+    * Cada proceso tiene su pila de kernel
+* El *hardware* guarda lo indispensable para poder retornar: PC, PSW y SP (*Stack Pointer*) de usuario. También enmascara las interrupciones, de manera que estas van a estar bloqueadas por el momento.
+* Con el número de la interrupción se indexa la tabla de vectores, se obtiene la dirección de la subrutina correspondiente y se carga en el PC.
+
+### Fase 2 (ISR y planificación)
+
+* Se resguardan los registros de uso general en la pila del kernel.
+    * El sp del kernel queda apuntando a estos registros. Justo debajo de ellos está también la información esencial que se guardó en la fase 1 (PC, PSW y SP del usuario). Esto es importante porque luego el sp del kernel se deberá almacenar en la fase 3.
+* Se notifica el fin de la interrupción al controlador.
+* Se actualiza la hora del sistema y el uso de CPU.
+* Se decrementa el *quantum* del proceso en ejecución.
+* Si el *quantum* se agotó, se invoca al *short-term scheduler*.
+    * El proceso saliente pasa de Running a Ready y su PCB se encola en la cola de listos
+    * Se elige al próximo proceso a ejecutar según el algoritmo usado (RR, FCFS, etc)
+    * Si se elige al mismo proceso, **no hay cambio de contexto**. Se retorna directamente (fase 4)
+
+### Fase 3 (el cambio de contexto)
+
+* Estos pasos los realiza el *dispatcher*.
+* El SP del kernel, que apuntaba a toda la información resguardada (PC, PSW, SP del usuario y registros generales) se almacena en el PCB del proceso en ejecución.
+    * De esta manera, en la PCB queda toda la información necesaria para seguir ejecutando el proceso.
+* Cambio de espacio de direcciones. Se carga el registro base de la tabla de páginas del proceso entrante.
+    * Solo es necesario si el entrante tiene otro espacio de direcciones.
+    * **Costo:** hay una tabla que almacena las traducciones recientes de direcciones lógicas a físicas, que funciona como una especie de caché para no tener que traducirlas cada vez. Al cambiar el estado de direcciones, la tabla se vuelve inútil hasta que se empiece a llenar de las traducciones del nuevo espacio de direcciones.
+* Se carga el contexto del proceso entrante. Dicho contexto se encuentra en la dirección a la que apunta el sp-kernel resguardado en el PCB del proceso.
+* Para obtener los datos del contexto, se deben desapilar todos esos datos de la pila del kernel del nuevo proceso.
+* *Nota:* mientras el CPU ejecuta todo esto, no puede estar ejecutando procesos. Es por esto que un cambio de contexto tiene cierto costo, y se dice que es **overhead** (no realiza trabajo útil para los procesos). Si se permite un grado de multiprogramación muy alto, generando cambios de contexto constantemente, podría tener efectos negativos en el rendimiento.
+
+### Fase 4 (retorno a modo usuario)
+
+* El Kernel ejecuta una instrucción atómica que desapila PC, PSW y SP de usuario, restaurando el estado que tenía el nuevo proceso al momento en el que fue suspendido originalmente.
+* El CPU vuelve a modo usuario.
 
 
 
