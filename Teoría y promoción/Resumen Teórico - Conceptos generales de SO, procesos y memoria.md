@@ -1,11 +1,10 @@
 * Parte 1
-    * Componentes de SO
     * Proceso de arranque
-    * System calls
+    * Conceptos generales gnu/linux
+    * Comandos
+    * Directorios importantes
 * Procesos
-    * PCB, que chota es
     * Módulos de planificación (schedulers, dispatcher, loader)
-    * Context switch
     * Estados de un proceso
     * Creación de procesos (fork, execev,exit, wait)
 * Memoria
@@ -137,7 +136,43 @@ while (true)
 * El *wrapper* interpreta el resultado del Kernel
     * Si hubo error, guarda el código en `errno` y devuelve -1.
     * Si no, devuelve el resultado de la system call (bytes leídos, PID, etc).
-  
+
+# Procesos
+
+## Componentes de un proceso
+
+* Un proceso ocupa su espacio de direcciones. En él se almacena:
+    * Sección de código
+    * Sección de datos (variables globales)
+    * Stack(s) (datos temporales).
+        * Con el enfoque en el que el kernel está dentro del proceso, se tiene una pila de usuario y una pila de kernel
+        * Está formado por stack frames que son pushed (al llamar a una rutina) y popped (cuando se retorna de ella)
+        * El stack frame tiene los parámetros de la rutina, y datos necesarios para recuperar el stack frame anterior (PC y el valor del stack pointer en el momento del llamado).
+
+## Atributos de un proceso
+
+* PID (identificador único de proceso)
+* PPID (ID del proceso que lo disparó, llamado proceso padre)
+* ID del usuario que lo disparó
+* ID del grupo que lo disparó (si hay)
+* En ambientes multiusuario, desde que terminal y quien lo ejecuto.
+
+## PCB
+
+* El PCB (*Process Control Block*) es una estructura de datos asociada a un proceso
+* Existe una por cada proceso
+* Es lo primero que se crea cuando se crea un proceso y lo último que se borra cuando termina
+* Contiene a información asociada con cada proceso:
+    * PID, PPID
+    * Valores de los registros de la CPU (PC, IR, PSW, SP, registros generales)
+    * Estado, prioridad, tiempo consumido
+    * Ubicación en memoria
+    * Accounting (estadísticas de uso de recursos)
+    * Entrada salida (estado, pendientes)
+* *Nota:* un proceso no puede acceder a su propio PCB. Es información que se guarda **fuera** del espacio de direcciones de un proceso, y a la que solo se puede acceder en modo kernel.
+* A la información que guarda la PCB sobre un proceso, que es la que el SO necesita para administrarlo y la CPU para ejecutarlo, se le llama **contexto**.
+* Cuando se habla de “colas de procesos”, como la cola de listo, en realidad la cola contiene los PCB de los procesos correspondientes.
+
 ## Cambio de contexto
 
 * Un cambio de contexto (*context switch*) sucede cuando en la CPU se está ejecutando un proceso A, pero se decide cederle la CPU a otro proceso B, guardando el estado de A para retomarlo después.
@@ -182,8 +217,18 @@ while (true)
 * El Kernel ejecuta una instrucción atómica que desapila PC, PSW y SP de usuario, restaurando el estado que tenía el nuevo proceso al momento en el que fue suspendido originalmente.
 * El CPU vuelve a modo usuario.
 
+## Estados de un proceso
 
-
+* Estado **new**: un usuario disparó el proceso. Se hizo la system call que empieza el proceso y su PCB. El proceso queda en la *cola de procesos* (ubicada en almacenamiento secundario).
+    * **Transición new → ready:** para pasar de new a ready, el long term scheduler debe elegir al proceso para cargarlo en RAM
+* Estado **ready**: el proceso ya fue cargado en RAM. Necesita la CPU para su ejecución, pero está esperando a que el short term scheduler lo elija para asignarle dicho recurso.
+    * **Transición ready → running:** Para pasar de ready a running, el short term scheduler debe elegir al proceso de la cola de **ready**. Luego, el dispatcher debe asignarle la CPU al proceso elegido por el short term scheduler. 
+* Estado **running**: el proceso ya fue elegido por el short term scheduler. Tendrá la CPU hasta que el algoritmo de planificación lo expulse, necesite E/S o termine. Si el algoritmo de planificación lo expulsó, pero el proceso todavía no terminó, vuelve a la cola de procesos **ready**.
+    * **Transición running → waiting:** el proceso “se pone a dormir”, esperando por un evento.
+* Estado **waiting**: el proceso está esperando a que ocurra un evento para continuar su ejecución. Dicho evento puede ser la terminación de una E/S solicitada, o la llegada de una señal por parte de otro proceso. Cuando termine el evento, vuelve al estado **ready**. Es importante aclarar que cuando un proceso simplemente está esperando a que le asignen la CPU, NO está en este estado (en ese caso está en el estado **ready**).
+    * **Transición waiting → de vuelta a ready:** Terminó la espera y compite nuevamente por la CPU.
+* Estado **terminated**: se llegó a la última instrucción del proceso. Se le avisa al kernel con la system call “exit” para que libera la RAM (borrando el PCB y otras cosas) y la CPU. Antes de borrar, hay un momento en el que el kernel conserva la PCB y otras cosas, aunque le proceso ya haya terminado. Se dice que el proceso está en “estado zombie”
+* *Nota:* puede haber múltiples colas para cada estado. Por ejemplo, para el estado waiting, va a haber una cola por cada evento al que se esté esperando.
 
 
 
