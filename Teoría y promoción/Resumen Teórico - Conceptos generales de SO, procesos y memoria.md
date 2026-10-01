@@ -5,7 +5,6 @@
     * Directorios importantes
 * Procesos
     * Módulos de planificación (schedulers, dispatcher, loader)
-    * Estados de un proceso
     * Creación de procesos (fork, execev,exit, wait)
 * Memoria
     * MMU que chota es
