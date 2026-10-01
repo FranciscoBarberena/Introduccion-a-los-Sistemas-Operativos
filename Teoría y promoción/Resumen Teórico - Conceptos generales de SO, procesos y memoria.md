@@ -3,13 +3,15 @@
     * Conceptos generales gnu/linux
     * Comandos
     * Directorios importantes
-* Procesos
-    * Módulos de planificación (schedulers, dispatcher, loader)
-    * Creación de procesos (fork, execev,exit, wait)
 * Memoria
     * MMU que chota es
     * Espacio de direcciones
     * Sistemas de administración de memoria (particiones fijas, particiones dinámicas, paginación, segmentación y segmentación paginada)
+
+# Parte A del práctico
+
+* Comandos
+    * Ver kill y killall
 
 # Conceptos generales
 
@@ -119,9 +121,9 @@ while (true)
     * Debe comprobar que, si hay punteros, deben apuntar al espacio de direcciones del proceso (y no del kernel).
 * Una vez que todos los parámetros fueron validados, se deben traer al kernel usando la subrutina copy\_from\_user()
 * Se ejecuta la subrutina de servicio.
-    * Caso en el que el servicio no es bloqueante
+    * Caso en el que el servicio no es bloqueante:
         * Lo importante es que en este caso, no sucede ningún cambio de contexto, y el proceso nunca dejó el estado *running*. Solo hubo un cambio de modo usuario a kernel, y luego de vuelta a modo usuario cuando retorna (fase 4).
-    * Caso en el que el servicio es potencialmente bloqueante
+    * Caso en el que el servicio es potencialmente bloqueante:
         * Si la subrutina pide datos, la rutina debe verificar si ya están disponibles.
         * Si lo están (por ejemplo, en el buffer cache): se copian al buffer del proceso y se retorna sin bloquear
         * Si no lo están: el Kernel solicita la operación al driver del dispositivo y el proceso debe esperar
@@ -166,11 +168,11 @@ while (true)
     * Valores de los registros de la CPU (PC, IR, PSW, SP, registros generales)
     * Estado, prioridad, tiempo consumido
     * Ubicación en memoria
-    * Accounting (estadísticas de uso de recursos)
+    * *Accounting* (estadísticas de uso de recursos)
     * Entrada salida (estado, pendientes)
 * *Nota:* un proceso no puede acceder a su propio PCB. Es información que se guarda **fuera** del espacio de direcciones de un proceso, y a la que solo se puede acceder en modo kernel.
 * A la información que guarda la PCB sobre un proceso, que es la que el SO necesita para administrarlo y la CPU para ejecutarlo, se le llama **contexto**.
-* Cuando se habla de “colas de procesos”, como la cola de listo, en realidad la cola contiene los PCB de los procesos correspondientes.
+* Cuando se habla de “colas de procesos”, como la cola de listo, en realidad la cola contiene los PCB de los procesos correspondientes, de manera enlazada.
 
 ## Cambio de contexto
 
@@ -229,5 +231,99 @@ while (true)
 * Estado **terminated**: se llegó a la última instrucción del proceso. Se le avisa al kernel con la system call “exit” para que libera la RAM (borrando el PCB y otras cosas) y la CPU. Antes de borrar, hay un momento en el que el kernel conserva la PCB y otras cosas, aunque le proceso ya haya terminado. Se dice que el proceso está en “estado zombie”
 * *Nota:* puede haber múltiples colas para cada estado. Por ejemplo, para el estado waiting, va a haber una cola por cada evento al que se esté esperando.
 
+## Módulos de planificación
 
+* Todos estos módulos son *software*.
 
+### Schedulers
+
+* Short term
+    * Determina cual de todos los procesos que está en la cola de **ready** (en RAM) se le asignará el CPU
+* Medium term
+    * Saca temporalmente de memoria los procesos que sea necesario para reducir el grado de multiprogramación (logra que haya menos procesos en memoria). Lo lleva al espacio SWAP, ubicado en el almacenamiento secundario.
+* Long term
+    * Elige cuál de los procesos en la *cola de procesos*, ubicada en almacenamiento secundario, será cargado en RAM.
+    * También controla el grado de multiprogramación
+
+### Dispatcher y loader
+
+* Dispatcher
+    * Hace cambio de contexto, cambio de modo de ejecución, ”despacha” en el CPU el proceso elegido por el *short term scheduler* (es decir, “salta” a la instrucción a ejecutar).
+* Loader
+    * carga en memoria el proceso elegido por el *long term scheduler*.
+
+## Creación de procesos
+
+* Un proceso es creado por otro proceso, formando un árbol.
+* En la creación de un proceso suceden los siguientes eventos:
+    * Creación de PCB
+    * Asignación de PID
+    * Asignación de memoria para regiones (código, datos y *stack*)
+* 2 opciones para el padre:
+    * Puede continuar ejecutándose concurrentemente con su hijo.
+    * Puede esperar a que el/los proceso/s hijo/s terminen para continuar la ejecución. Esto lo hace mediante la system call *“wait”*. Esta *system call* espera a recibir un código de retorno para continuar la ejecución.
+
+### Funcionamiento en Unix (fork + execve)
+
+#### Fork
+
+* Hay una system call llamada *fork* que crea un nuevo proceso igual al llamador.
+    * Que sea igual implica: mismo código, mismos datos y mismo stack. Se duplica el espacio de direcciones del proceso llamador.
+* Al llamar x = fork(), se creará un nuevo proceso idéntico al padre.
+    * ¿Qué valor queda en x?
+        * En el proceso padre, x va a tomar el PID del hijo que acaba de crear.
+        * En el proceso hijo, x va a tomar el valor 0.
+        * Si da error, y no se crea el hijo, x toma un valor negativo.
+    * Esto nos sirve para ejecutar distintas líneas en el proceso hijo que en el proceso padre. Una de las líneas más comunes es llamar a la system call execve.
+
+#### Excecve
+
+* Al ejecutarse, carga un nuevo programa (pasado por parámetro como un *path*) en el espacio de direcciones del proceso actual. Al hacer eso, borra todo el contexto (*stack*, datos, código) previamente almacenados en el espacio de direcciones.
+* Un fork, seguido de un execve en el hijo, es la manera en la que un proceso puede crear a otro en **Unix**.
+
+# Memoria
+
+## Direcciones lógicas y físicas
+
+* **Direcciones lógicas o virtuales:** son las que entiende el proceso, hacen referencia al espacio de direcciones del mismo. No tienen que ver con el lugar real en la RAM.
+* **Direcciones físicas:** referencian a un lugar específico en la RAM.
+* **Problema:** si un proceso pide cargar X en 1000h, se refiere a la dirección virtual 1000h. Entonces, ¿en qué parte de la RAM se carga realmente X? Se requiere una traducción de direcciones.
+
+## MMU (Memory Management Unit)
+
+* Es parte del CPU (*hardware*).
+* Reprogramarlo es una instrucción privilegiada (solo se puede hacer en modo kernel).
+* Se encarga del mapeo (traducción) de direcciones
+
+## Mecanismos de asignación de memoria
+
+### Particiones fijas
+
+* La memoria se divide en particiones o regiones de tamaño fijo (pueden ser todas del mismo tamaño o no). Cada partición aloja a un solo proceso.
+* Al cargar un proceso en memoria, se debe elegir en qué partición cargarlo. Opciones:
+    * **First fit:** se recorre la memoria hasta encontrar a una partición libre en la que quepa el proceso. Se carga en dicha partición.
+    * **Next fit:** mantiene un puntero del último bloque de memoria que fue asignado o examinado. En vez de comenzar a recorrer la memoria desde el principio, empieza a recorrer desde donde apunta dicho puntero. Desde allí, elige la primera partición que encuentre (siempre y cuando quepa el proceso a cargar)
+    * **Best fit**: lo carga en la partición cuyo tamaño sea lo más similar posible al proceso (puede ser igual o mayor).
+    * **Worst fit:** no tiene sentido en particiones fijas, se usa en particiones dinámicas.
+* Esta técnica genera fragmentación interna. Generalmente la partición elegida no es exactamente del mismo tamaño que el proceso cargado.
+
+### Particiones dinámicas
+
+* Las particiones siguen alojando a un proceso cada una.
+* El tamaño de la partición es igual al proceso que se está cargando. Es decir, si se carga un proceso de 300 bytes, se creará una partición de ese mismo tamaño, y se le asignará.
+* Además de las técnicas mencionadas, puede usar también la técnica de worst fit
+    * **Worst fit:** se busca el conjunto contiguo de mayor tamaño en el que quepa el proceso. Luego, se le asigna únicamente su tamaño real, dejando el resto libre y sin asignar.
+    * **Ejemplo:** se quiere cargar un proceso de 100 bytes, y la RAM se encuentra en el siguiente estado:
+        * 200 bytes libres
+        * Un proceso X
+        * 1500 bytes libres
+        * Un proceso Y
+        * 100 bytes libres
+    * Según la política de worst fit, se elegiría el espacio contiguo libre más grande. En este caso es el de 1500 bytes. De esos 500 bytes, solo se le asignarán 100 bytes al proceso (porque ese es su tamaño), dejando 1400 bytes libres en ese espacio. La RAM quedaría así:
+        * 200 bytes libres
+        * Un proceso X
+        * **EL NUEVO PROCESO DE 100 BYTES**
+        * 1400 bytes libres
+        * Un proceso Y
+        * 100 bytes libres
+* Esta técnica genera fragmentación externa. Como siempre se le asigna el tamaño justo a los procesos, es proable que queden espacios sueltos de poco tamaño, que jamás serán asignados
