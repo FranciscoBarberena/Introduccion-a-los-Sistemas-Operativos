@@ -165,6 +165,7 @@ grep "nombre_usuario" /etc/passwd | cut -d: -f7
 
 ## Punto 7
 ### Inciso A
+
 * Una partición de disco es una región de almacenamiento secundario, que se crea con el fin de que dicha área pueda manejarse de manera independiente a las otras.
 * Tipos de particiones:
     * **Partición primaria:** división cruda del disco (solo puede haber 4 por disco). Se almacena información de la misma en el MBR.
@@ -193,6 +194,7 @@ grep "nombre_usuario" /etc/passwd | cut -d: -f7
             * ID: sda1
             * Punto de montaje: `/`
 ### Inciso D
+
 * DUDA distintos esquemas de particionamiento para distintos usos
 
 ### Inciso E
@@ -212,8 +214,7 @@ grep "nombre_usuario" /etc/passwd | cut -d: -f7
 * UEFI (*Unified Extensible Firmware Interface*) realiza las mismas tareas que la BIOS, y es su reemplazo en computadoras modernas. A diferencia de la BIOS, que era propietario de IBM, UEFI es un estándar abierto de la industria. En vez de ejecutar ciegamente los primeros 512 bytes del disco, tiene en su placa madre un puntero a la tabla de particiones GPT. De aquí sabe a dónde ir para llegar a la partición especial ESP, que es un file system FAT32, que UEFI puede leer. En dicha partición, busca el archivo `.efi` de arranque y lo ejecuta.
 
 ### Inciso C
-* El MBR (*Master Boot Record*) son 512 bytes de un disco, que tienen información especial, y están siempre ubicados en el cilindro 0, cabeza 0,
-sector 1. Los primeros 446 bytes tienen instrucciones rudimentarias para que arranque el sistema operativo. Luego tiene la tabla de particiones primarias, que ocupa 64 bytes. Finalmente, se firma con 2 bytes especiales. La limitación de tener solo 4 particiones primarias viene de que la información de cada partición ocupa 16 bytes, y la tabla de particiones tiene un tamaño de 64 bytes.
+* El MBR (*Master Boot Record*) son 512 bytes de un disco, que tienen información especial, y están siempre ubicados en el cilindro 0, cabeza 0, sector 1. Los primeros 446 bytes tienen instrucciones rudimentarias para que arranque el sistema operativo. Luego tiene la tabla de particiones primarias, que ocupa 64 bytes. Finalmente, se firma con 2 bytes especiales. La limitación de tener solo 4 particiones primarias viene de que la información de cada partición ocupa 16 bytes, y la tabla de particiones tiene un tamaño de 64 bytes.
 
 ### Inciso D
 * Las siglas GPT significan *GUID Partition Table* y son el reemplazo de la tabla de particiones del MBR, eliminando la limitación de 4 particiones primarias. De cada partición se almacena el nombre y las coordenadas de inicio y fin.
@@ -497,8 +498,8 @@ file prueba.exe
 12. El sistema está listo para ser usado.
 
 ### Inciso B
-* El proceso **init** es el único que se considera que no tiene padre, por lo que no es ejecutado por otro proceso. Su función es cargar todos los subprocesos necesarios para el
-correcto funcionamiento del Sistema Operativo. También es el encargado de montar los filesystems y de hacer disponible los demás dispositivos.
+
+* El proceso **init** es el único que se considera que no tiene padre, por lo que no es ejecutado por otro proceso. Su función es cargar todos los subprocesos necesarios para el correcto funcionamiento del Sistema Operativo. También es el encargado de montar los filesystems y de hacer disponible los demás dispositivos.
 
 ### Inciso C
 * El *runlevel* es el nivel de ejecución en el que se encuentra el SO. Cada nivel limita la serie de servicios que se pueden ejecutar:
@@ -516,6 +517,7 @@ correcto funcionamiento del Sistema Operativo. También es el encargado de monta
     * Esto se define en el archivo inittab. Particularmente, hay una directiva que es initdefault. El runlevel definido allí es en el que se va a iniciar el sistema. Por ejemplo: id:5:initdefault iniciaría en runlevel 5, con interfaz gráfica.
 
 ### Inciso E
+
 * El archivo inittab sirve para dictarle a init qué debe hacer, qué programas debe arrancar y qué debe detener dependiendo del estado (runlevel) en el que se encuentre el sistema.
 * La estructura de la información almacenada es: id:runlevels:acción:proceso
 * Contiene las asociaciones de qué scripts deben realizarse al pasar a cada *runlevel*. El directorio de los enlaces a los scripts es /etc/rcX.d (donde X es el número de runlevel entre 0 y 6).
@@ -720,7 +722,7 @@ getent group
 
 ### Inciso D
 
-* Cada proceso tiene 3 *stream* de texto plano. Uno de entrada (*standard input* o *stdin*) y 2 de salida: *standard output* (*stdout*) y *standard error* (*stderr*). Cada uno de estos *streams* tiene una fuente o un destino por defecto:
+* Cada proceso tiene 3 *stream* de texto plano. Uno de entrada (*standard input* o *stdin*) y 2 de salida: *standard output* (*stdout*) y *standard error* (*stderr*). Se dice que son archivos virtuales. Cada uno de estos *streams* tiene una fuente o un destino por defecto:
     * *stdin* es la fuente de entrada para un comando, y por defecto, la recibe del teclado.
     * *stdout* y *stderr* son fuentes de salida de un comando. La primera devuelve la salida esperada por el comando, y la segunda devuelve los mensajes de error, si es que hubo. Ambas, por defecto, se imprimen en el monitor.
     * Cambiar la fuente por defecto de cualquiera de estos *streams*; es decir, hacer que *stdin* reciba el comando por algo que no sea el teclado, o hacer que *stdout* o *stderr* lleven su salida a algo que no sea el monitor, se llama *redirección*. El *pipe* es un ejemplo de redirección, ya que hace que la *stdout* de un proceso vaya a la entrada de otro, en vez de al monitor.

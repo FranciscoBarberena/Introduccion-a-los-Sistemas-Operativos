@@ -1,17 +1,6 @@
-* Parte 1
-    * Proceso de arranque
-    * Conceptos generales gnu/linux
-    * Comandos
-    * Directorios importantes
-* Memoria
-    * MMU que chota es
-    * Espacio de direcciones
-    * Sistemas de administración de memoria (particiones fijas, particiones dinámicas, paginación, segmentación y segmentación paginada)
 
-# Parte A del práctico
+    * Falta paginación
 
-* Comandos
-    * Ver kill y killall
 
 # Conceptos generales
 
@@ -326,4 +315,12 @@ while (true)
         * 1400 bytes libres
         * Un proceso Y
         * 100 bytes libres
-* Esta técnica genera fragmentación externa. Como siempre se le asigna el tamaño justo a los procesos, es proable que queden espacios sueltos de poco tamaño, que jamás serán asignados
+* Esta técnica genera fragmentación externa. Como siempre se le asigna el tamaño justo a los procesos, es probable que queden espacios sueltos de poco tamaño, que jamás serán asignados.
+
+### Segmentación
+
+* Esquema que se asemeja a la “visión del usuario”.
+* El programa se divide en segmentos, y cada segmento es una unidad lógica como: programa principal, procedimientos y funciones, variables locales y globales, stack, etc.
+* Cada segmento puede tener un tamaño distinto.
+* Lo que se carga en RAM siempre es un segmento. Esto significa que no hay fragmentación interna, aunque sí genera externa por los mismos motivos que las particiones dinámicas.
+    * **Ejemplo:** se carga el sector de código (200 bytes) de un proceso. En la RAM ocupará exactamente 200 bytes, por lo que no hay fragmentación interna.
