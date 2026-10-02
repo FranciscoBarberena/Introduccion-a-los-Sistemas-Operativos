@@ -229,6 +229,7 @@ DUDA preguntar esto porque es importante
 
 * Con estándar BIOS:
     * Se prende la computadora.
+    * Se ejecuta el código de la BIOS, cuya última acción es cargar el MBR
     * Se ejecuta el código ubicado en el cilindro 0, cabeza 0, sector 1 del disco. Aquí está el MBR.
     * Primero se ejecuta el MBC, con instrucciones simples que leen la tabla de particiones.
     * Se lee la tabla de particiones, y se busca aquella con el flag de *booteable* activo.

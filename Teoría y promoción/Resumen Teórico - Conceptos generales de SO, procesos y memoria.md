@@ -1,7 +1,3 @@
-
-    * Falta paginación
-
-
 # Conceptos generales
 
 ## Componentes de SO
@@ -319,8 +315,33 @@ while (true)
 
 ### Segmentación
 
-* Esquema que se asemeja a la “visión del usuario”.
+* Esquema que se asemeja a la “visión del usuario”. Es visible al programador
 * El programa se divide en segmentos, y cada segmento es una unidad lógica como: programa principal, procedimientos y funciones, variables locales y globales, stack, etc.
 * Cada segmento puede tener un tamaño distinto.
 * Lo que se carga en RAM siempre es un segmento. Esto significa que no hay fragmentación interna, aunque sí genera externa por los mismos motivos que las particiones dinámicas.
     * **Ejemplo:** se carga el sector de código (200 bytes) de un proceso. En la RAM ocupará exactamente 200 bytes, por lo que no hay fragmentación interna.
+* El kernel mantiene una tabla de segmentos para cada proceso. En cada entrada se encuentra el número de segmento, la dirección física en donde comienza, y su longitud.
+* Una dirección lógica contiene: número de segmento (por ejemplo, 4) y desplazamiento dentro del mismo (por ejemplo, 100)
+    * Para que el MMU traduzca eso a una dirección física, consulta la tabla de segmentos. Ve que el segmento 4 comienza en la dirección 400, y tiene una longitud de 1000. Se debe desplazar 100 posiciones desde el comienzo del segmento, resultando en la dirección física 500.
+    * *Nota:* si el desplazamiento hubiese sido 1500, hubiese dado un error de direccionamiento. Esto se debe a que el desplazamiento debe ser menor o igual a la longitud del segmento, que en este caso es 1000.
+
+### Paginación
+
+* Es invisible al programador.
+* Se divide el espacio de direcciones en partes de igual tamaño (páginas).
+* Se divide la RAM en partes de igual tamaño a las páginas, llamadas *frames*.
+* Cada vez que se carga algo en RAM, se carga una página.
+* Hay fragmentación interna en la última página de cada proceso.
+* El kernel mantiene una tabla de páginas para cada proceso. Contiene, para cada página, el frame en donde está ubicada.
+* Una dirección lógica ahora contiene: número de página (por ejemplo, 8) y desplazamiento dentro de la misma (por ejemplo, 100).
+    * Para que el MMU traduzca eso a una dirección física, consulta la tabla de páginas. Ve que la página 8 está en realidad en el frame 50. Si el frame 50 empieza en la dirección física 25600, se debe desplazar 100 direcciones desde ahí. La dirección física resultante sería 25700.
+    * *Nota:* en este caso, es imposible que el desplazamiento sea mayor a la longitud de página, ya que la longitud de página la define la cantidad de bits que se usa para direccionar el desplazamiento. 
+
+### Segmentación paginada
+
+* Los segmentos son visibles al programador, pero las páginas no.
+* Cada programa se divide en segmentos, y cada segmento se divide en páginas.
+* Hay fragmentación interna en la última página de cada segmento.
+* No hay fragmentación externa
+* Cada dirección lógica tiene: número de segmento, número de página y desplazamiento dentro de la página.
+* Hay una tabla de segmentos para cada proceso. A su vez, hay una tabla de páginas para cada entrada en cada tabla de segmentos.

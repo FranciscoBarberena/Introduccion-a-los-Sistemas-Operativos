@@ -2,8 +2,50 @@
     * Proceso de arranque
         * UEFI
     * Conceptos generales gnu/linux
-    * Comandos
-    * Directorios importantes
+
+## Proceso de arranque
+
+### BIOS
+
+* La BIOS (*Basic Input/Output System*) es *firmware* que se almacena en un *chip* directamente soldado en la placa madre. Contiene la información necesaria para arrancar una computadora, con su última acción siendo leer el MBC del MBR, que comienza la carga del SO.
+
+### MBR
+
+* Está en el cilindro 0, cabeza 0, sector 1 de un disco duro.
+* Ocupa 512 bytes
+    * 446 bytes son el MBC (*master boot code*). Tiene instrucciones simples para leer la tabla de particiones.
+    * 64 bytes es la tabla de particiones. La información de cada partición ocupa 16 bytes.
+    * Los 2 bytes restantes se usan para firmarlo.
+
+### Tabla de particiones del MBR
+
+* Al ocupar 64 bytes, y cada partición ocupar 16 bytes, solo puede tener información de 4 particiones.
+* De esas 4 particiones se pueden tener:
+    * Las 4 primarias
+    * 3 primarias y 1 extendida. La partición extendida no tiene un *file system*, sino que solo contiene información de sus particiones lógicas. Cada partición lógica tiene un puntero a la siguiente, funcionando como una lista enlazada. Para llegar a la primera, se accede desde la partición extendida 
+
+### UEFI
+
+* UEFI (*Unified Extensible Firmware Interface*) realiza las mismas tareas que la BIOS, y es su reemplazo en computadoras modernas. A diferencia de la BIOS, que era propiedad de IBM, UEFI es un estándar abierto de la industria (es de UEFI Forum, que no tiene fines de lucro). En vez de ejecutar ciegamente los primeros 512 bytes del disco, tiene en su placa madre un puntero a la tabla de particiones GPT. De aquí sabe a dónde ir para llegar a la partición especial ESP, que es un file system FAT32, que UEFI puede leer. En dicha partición, busca el archivo `.efi` de arranque y lo ejecuta.
+
+### Tabla de particiones GPT
+
+* Las siglas GPT significan *GUID Partition Table* y son el reemplazo de la tabla de particiones del MBR, eliminando la limitación de 4 particiones primarias. De cada partición se almacena el nombre y las coordenadas de inicio y fin.
+
+### Proceso de arranque en system V
+
+1. Se empieza a ejecutar el código del BIOS.
+2. El BIOS ejecuta el POST.
+3. El BIOS lee el sector de arranque (MBR).
+4. Se carga el gestor de arranque (MBC). *Acá se puede cargar GRUB*
+5. El bootloader carga el kernel y el initrd (initial ram disk).
+6. Se monta el initrd como sistema de archivos raíz y se inicializan componentes esenciales (por ejemplo, el scheduler).
+7. El Kernel ejecuta el proceso init y se desmonta el initrd.
+8. Se lee el `/etc/inittab`. En este archivo están las reglas, acciones y niveles de ejecución (runlevels) en el formato `id:runlevels:acción:proceso`
+9. Se ejecutan los scripts apuntados por el runlevel 1.
+10. El final del runlevel 1 le indica que vaya al runlevel por defecto.
+11. Se ejecutan los scripts apuntados por el runlevel por defecto.
+12. El sistema está listo para ser usado
 
 ## Directorios
 
