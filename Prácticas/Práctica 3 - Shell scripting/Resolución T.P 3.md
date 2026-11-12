@@ -177,3 +177,12 @@ done
         * echo $mi_variable # NO HACE NADA, porque esa variable era local al script
         * echo $mi_entorno # Imprime “Mundo”. Importantemente, si el script hijo modifica la variable, no se modifica en el padre, porque se pasa una copia.
 
+## Punto 15
+
+* -c: imprime solo los caracteres del número x al y. Ejemplo: cut -c x-y imprime los caracteres del x al y
+* -f imprime solo los primeros X campos. Por defecto, los campos se separan por un tab. Ejemplo: cut -f 25, imprime los primeros 25 campos separados por un \t
+* -d:
+    * Se usa con -f. Sirve para cambiar el separador de los campos a algo que no sea tab. Ejemplo: cut -d: -f 25. Imprime los primeros 25 campos separados por un ":"
+* -s
+    * Se usa con -f. Sirve para no imprimir las líneas que no contienen el delimitador. En el ejemplo anterior, si una línea no contuviese el “:”, no la imprimiría.
+
