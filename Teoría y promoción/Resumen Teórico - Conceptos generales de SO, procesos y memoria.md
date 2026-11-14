@@ -312,6 +312,7 @@ while (true)
         * Un proceso Y
         * 100 bytes libres
 * Esta técnica genera fragmentación externa. Como siempre se le asigna el tamaño justo a los procesos, es probable que queden espacios sueltos de poco tamaño, que jamás serán asignados.
+
 # Memoria
 
 ## Direcciones lógicas y físicas
@@ -391,6 +392,7 @@ while (true)
 * No hay fragmentación externa
 * Cada dirección lógica tiene: número de segmento, número de página y desplazamiento dentro de la página.
 * Hay una tabla de segmentos para cada proceso. A su vez, hay una tabla de páginas para cada entrada en cada tabla de segmentos.
+
 ### Segmentación
 
 * Esquema que se asemeja a la “visión del usuario”. Es visible al programador
