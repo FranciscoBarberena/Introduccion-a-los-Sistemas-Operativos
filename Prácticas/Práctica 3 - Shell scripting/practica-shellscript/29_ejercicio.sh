@@ -9,7 +9,7 @@ if [ ! -d $destino ]; then
 fi
 cantidadMovidos=0
 for file in *; do
-	if [ ! -f $file ]; then
+	if [ ! -f "$file" ] || [ ! -x "$file" ]; then
 		continue
 	fi
 	mv $file $destino
