@@ -1,4 +1,4 @@
-# Práctica 4
+# Memoria virtual
 
 ## Punto 1
 
@@ -151,3 +151,63 @@
 * Escenario 5: el kernel no debe hacer nada.
 
 * Escenario 6: el kernel debe quitarle frames a cualquiera de los procesos, priorizando los de menor PFF, hasta llegar a 20 frames libres.
+
+# Administración de discos
+
+## Punto 12
+
+* Un disco rígido está organizado en platos. Cada plato tiene 2 caras, que están separadas en pistas, que a su vez están separadas en sectores.
+* Un cilindro son todas las n-ésimas pistas de todas las caras. Como están a la misma distancia del eje de rotación, son las pistas que que las cabezas pueden leer/escribir simultáneamente sin mover el brazo actuador.
+* El sector es la unidad mínima de almacenamiento, aunque el kernel puede usar *clusters*, lo que hace que la unidad mínima de trabajo del SO pueda ser mayor a 1 sector.
+
+## Punto 13
+
+* Seek time: tiempo que tarda la cabeza en posicionarse en el cilindro. Es el tiempo que mayor influencia tiene sobre la velocidad de transferencia de datos.
+* Latency time: una vez que la cabeza encuentra la pista, es el tiempo que sucede hasta que el sector a buscar pasa por debajo de la misma. En la materia asumimos que es igual a lo que tarda el disco en dar media vuelta.
+* Transfer time: tiempo de transferencia del sector (o conjunto de sectores/bloque) del disco a la RAM.
+
+# Administración de archivos
+
+## Punto 20
+
+* Capacidad en sectores = `10*2*350*500 = 3.500.000`
+* Capacidad en clusters de 4 sectores = `3.500.000/4 = 875.000`
+* Capacidad en clusters de 8 sectores = `3.500.000/8 = 437.500`
+
+## Punto 21
+
+* Cluster 0 = sectores 120 a 127
+* Cluster 123 = `(123*8) + 120 = sectores 1104 a 1111`
+* Cluster 299 = `(299*8) + 120 =  sectores 2512 a 2519`
+* Cluster 1001 = `(1001*8) + 120 = sectores 8128-8135`
+
+## Punto 22
+
+### Inciso A
+
+* Seek time
+    * 10ms
+* Latency time
+    * 9000 revoluciones → 60.000ms
+    * ½ revolución → latency = 3,333ms...
+* Transfer time
+    * Velocidad es 10MiB/seg
+    * 1 cluster = `16 sectores * 512B = 8192B`
+    * 10MiB son `1024*1024*10 = 10.485.760B`
+    * Proporciones
+        * 10.485.760 B → 1000ms
+        * 8192B → 0,78125ms
+* Tiempo total = `10ms + 0,78125ms + 3,333ms = 14,114583333ms`
+
+### Inciso B
+
+* Seek time
+    * 10ms*16 = 160ms
+* Latency time
+    * 3,333ms * 16 = 53,333…ms
+* Transfer time = 0,78125ms
+* Tiempo total = `160ms + 53,333ms + 0,78125ms =  214,114583333ms`
+
+### Inciso C
+
+* Aunque la cantidad de información transferida es la misma, el tiempo del caso B es mucho mayor. Esto se debe a que el tiempo de transferencia es despreciable en comparación al tiempo de seek (y, en un menor grado, la latencia), y tener los sectores distribuidos aleatoriamente hace que se deba hacer un seek por cada sector.
