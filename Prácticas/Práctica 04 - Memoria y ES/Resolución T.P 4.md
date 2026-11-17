@@ -162,9 +162,13 @@
 
 ## Punto 13
 
-* Seek time: tiempo que tarda la cabeza en posicionarse en el cilindro. Es el tiempo que mayor influencia tiene sobre la velocidad de transferencia de datos.
-* Latency time: una vez que la cabeza encuentra la pista, es el tiempo que sucede hasta que el sector a buscar pasa por debajo de la misma. En la materia asumimos que es igual a lo que tarda el disco en dar media vuelta.
-* Transfer time: tiempo de transferencia del sector (o conjunto de sectores/bloque) del disco a la RAM.
+* **Seek time:** tiempo que tarda la cabeza en posicionarse en el cilindro. Es el tiempo que mayor influencia tiene sobre la velocidad de transferencia de datos.
+* **Latency time:** una vez que la cabeza encuentra la pista, es el tiempo que sucede hasta que el sector a buscar pasa por debajo de la misma. En la materia asumimos que es igual a lo que tarda el disco en dar media vuelta.
+* **Transfer time:** tiempo de transferencia del sector (o conjunto de sectores/bloque) del disco a la RAM.
+
+## Punto 17
+
+* SSTF es el único que puede provocar inanición, en el caso de que siempre lleguen requerimientos cercanos a la posición actual, y nunca se atiendan los lejanos.
 
 # Administración de archivos
 
@@ -210,4 +214,4 @@
 
 ### Inciso C
 
-* Aunque la cantidad de información transferida es la misma, el tiempo del caso B es mucho mayor. Esto se debe a que el tiempo de transferencia es despreciable en comparación al tiempo de seek (y, en un menor grado, la latencia), y tener los sectores distribuidos aleatoriamente hace que se deba hacer un seek por cada sector.
+* Aunque la cantidad de información transferida es la misma, el tiempo del caso B es mucho mayor. Esto se debe a que el tiempo de transferencia es despreciable en comparación al tiempo de seek y latencia (especialmente el seek), y tener los sectores distribuidos aleatoriamente hace que se deba hacer un seek por cada sector.
