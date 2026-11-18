@@ -272,7 +272,7 @@
 ### Inciso A
 
 * Un sector contiene: `512 bytes / 32 bits = 128` direcciones como máximo
-* `(10*512 bytes) + (1*128*512 bytes) + (2*128*128*512 bytes) = 16.847.872 bytes`
+* Tamaño máximo = `(10*512 bytes) + (1*128*512 bytes) + (2*128*128*512 bytes) = 16.847.872 bytes`
 * Sectores necesarios para cada archivo:
     * Archivo A (55 KiB = 56.320 bytes)
         * Ocupa los 10 sectores referenciados directamente (ocupa 5.120 bytes, quedan 51.200 bytes por almacenar)
@@ -292,10 +292,76 @@
         * Fragmentación interna: 0
     * Archivo C (1075 KiB = 1.100.800 bytes)
         * Ocupa los 10 sectores referenciados directamente (ocupa 5.120 bytes, quedan 1.095.680 bytes por almacenar)
-        * Ocupa completamente los 128 sectores referenciado indirectamente de manera simple, (65.536 bytes, quedan 1.030.324 bytes)
-        * Usa el primero de los punteros con direccionamiento indirecto doble. Los sectores de este pueden tener hasta 8.388.608 bytes, pero solo se ocupan 1.030.324 bytes.
+        * Ocupa completamente los 128 sectores referenciado indirectamente de manera simple, (65.536 bytes, quedan 1.030.144 bytes)
+        * Usa el primero de los punteros con direccionamiento indirecto doble. Los sectores de este pueden tener hasta 8.388.608 bytes, pero solo se ocupan 1.030.144 bytes.
             * De los 16.384 sectores, ocupa 2012.
         * Usa 17 sectores de indirección simple y 1 de indirección doble (18 en total)
-        * Cantidad total de sectores: 128 + 10 + 2013 + 18 = 2168 sectores
+        * Cantidad total de sectores: 128 + 10 + 2012 + 18 = 2168 sectores
         * El último puntero con direccionamiento doble queda sin utilizar.
-        * Fragmentación interna: 0
+        * Fragmentación interna: 0 bytes
+
+### Inciso B
+
+* Un cluster contiene: `2 KiB / 32 bits = 512` direcciones como máximo
+* Tamaño máximo = `(10*2048 bytes) + (1*512*2048 bytes) + (2*512*512*2048 bytes) = 1.074.810.880 bytes`
+* Clusters necesarios para cada archivo:
+    * Archivo A (55 KiB = 56.320 bytes)
+        * Ocupa los 10 clusters referenciados directamente (ocupa 20.480 bytes, quedan 35.840 bytes por almacenar)
+        * Del cluster referenciado indirectamente de manera simple, que puede tener hasta 1.048.576 bytes, ocupa solo 35.840 bytes
+            * De los 512 clusters, ocupa 18 (del último ocupa solo la mitad, es decir, 1024 bytes)
+        * Usa un cluster de indirección (+1)
+        * Cantidad total de clusters: `10 + 18 + 1 = 29`
+        * No utiliza los clusters con direccionamiento indirecto doble
+        * Fragmentación interna: 1024 bytes
+    * Archivo B (12 KiB = 12.288 bytes)
+        * Ocupa 6 clusters de los 10 referenciados directamente (ocupa 12.288 bytes)
+        * Cantidad total de clusters: `6`
+        * No utiliza los clusters con direccionamiento indirecto.
+        * Fragmentación interna: 0 bytes
+    * Archivo C (1075 KiB = 1.100.800 bytes)
+        * Ocupa los 10 clusters referenciados directamente (ocupa 20.480 bytes, quedan 1.080.320 bytes por almacenar)
+        * Ocupa completamente los 512 clusters referenciado indirectamente de manera simple, (1.048.576 bytes, quedan 31.744 bytes)
+        * Usa el primero de los punteros con direccionamiento indirecto doble. Los clusters de este pueden tener hasta 536.870.912 bytes, pero solo se ocupan 31.744 bytes.
+            * De los 262.144 clusters, ocupa 16 (del último solo ocupa la mitad, es decir, 1024 bytes). Todos estos clusters se referencian por la primera entrada del índice de indirección doble, que apunta a uno simple del cual se usan sus primeras 16 entradas
+        * En total se usan 3 clusters de direccionamiento.
+        * Cantidad total de clusters: `10 + 512 + 3 + 16  = 541`
+        * El último puntero con direccionamiento doble queda sin utilizar.
+        * Fragmentación interna: 1024 bytes
+
+## Punto 27
+
+* Si los archivos están almacenados de manera contigua y se usan sectores de 512 bytes:
+    * Archivo A (55 KiB = 56.320 bytes)
+        * Seek = 10,5 ms
+        * Transfer:
+            * 146 MiB = 153.092.096 bytes = 299.008 sectores
+            * 299.008 sectores → 1000ms
+            * 111 sectores → Transfer time = 0,371ms
+        * Latency
+            * 7200 REV → 60.000ms
+            * 0.5 REV → Latency time = 4,166ms
+        * Total = `10,5ms + 0,371ms + 4,166ms = 15,038ms`
+* Si los archivos están almacenados de manera aleatoria y se usan sectores de 512 bytes
+    * Archivo A (55 KiB = 56.320 bytes)
+        * Seek = (111 sectores)*10,5 ms = 1.165,5ms
+        * Transfer:
+            * 146 MiB = 153.092.096 bytes = 299.008 sectores
+            * 299.008 sectores → 1000ms
+            * 111 sectores → Transfer time = 0,371ms
+        * Latency
+            * 7200 REV → 60.000ms
+            * 0.5 REV → Latency time = 4,166ms
+            * 4,166ms * (111 sectores) = 462,42ms
+        * Total = `1165,5ms + 0,371ms + 462,42ms = 1628,29ms`
+* * Si los archivos están almacenados de manera aleatoria y se usan clusters de 2048 bytes
+    * Archivo A (55 KiB = 56.320 bytes)
+        * Seek = (29 clusters)*10,5 ms = 304,5ms
+        * Transfer:
+            * 146 MiB = 153.092.096 bytes = 74.752 clusters
+            * 74.752 clusters → 1000ms
+            * 29 clusters → Transfer time = 0,39ms
+        * Latency
+            * 7200 REV → 60.000ms
+            * 0.5 REV → Latency time = 4,166ms
+            * 4,166ms * (29 clusters) = 120,83ms
+        * Total = `304,5ms + 0,39ms + 120,83ms = 425,72ms`
