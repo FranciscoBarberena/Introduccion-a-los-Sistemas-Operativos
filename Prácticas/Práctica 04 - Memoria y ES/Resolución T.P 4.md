@@ -215,3 +215,87 @@
 ### Inciso C
 
 * Aunque la cantidad de información transferida es la misma, el tiempo del caso B es mucho mayor. Esto se debe a que el tiempo de transferencia es despreciable en comparación al tiempo de seek y latencia (especialmente el seek), y tener los sectores distribuidos aleatoriamente hace que se deba hacer un seek por cada sector.
+
+## Punto 23
+
+* Cada partición de un disco tiene un file system, que a su vez contiene:
+    * Un bloque de booteo, con el código para bootear el S.O.
+    * Un super-bloque, que tiene atributos sobre el file system
+    * Un gestor de espacio libre, que a veces está incluido en el super-bloque. Puede usar un vector de bits, bloques libres encadenados o agrupamiento
+    * Una tabla de I-NODOS
+        * Tiene una entrada por cada posible archivo del sistema. En cada entrada se almacena información sobre ese archivo (tipo, permisos, contador de enlaces, última fecha de modificación del contenido, última fecha de modificación del I-NODO, etc). El nombre no se almacena porque eso se almacena en los directorios (cada directorio tiene un nombre asociado a un I-NODO)
+        * También cada I-NODO tiene 13 campos para direcciones a los bloques de datos, tal como se describe en la consigna del siguiente punto (24)
+    * Directorio raíz de la partición (punto de montaje)
+    * Los datos en sí (archivos, directorios, etc).
+
+## Punto 24
+
+### Inciso B
+
+* Si cada cluster es de 1 KiB y para referenciar un cluster se necesitan 32 bits:
+    * En un cluster de 1 KiB entran: `1KiB / 32 bits = 256 direcciones`
+* Tamaño máximo de un archivo:
+    * Un I-NODO tiene información de un archivo.
+    * Tiene 10 punteros a clusters de datos. `10*1KiB = 10KiB`
+    * Tiene 1 puntero a un cluster de punteros a datos. `256*1KiB = 256 KiB`
+    * Tiene 1 puntero a un cluster de punteros hacia otro cluster de punteros. `256 * 256 * 1KiB = 65.536 KiB`
+    * Triple indirección: `256*256*256 * 1KiB = 16.777.216 KiB`
+    * Tamaño máximo de un archivo: `10 KiB + 256 KiB + 65.536KiB + 16.777.216 KiB = 16,06 GiB`
+
+## Punto 25
+
+### Inciso A
+
+* En la tabla de tuplas que es el directorio, se agrega una nueva entrada, de la forma: `Archivo1 --> I-NODO`
+
+### Inciso B
+
+* Se modifica el contenido del Archivo1
+* Se modifica el I-NODO del Archivo1, ya que se actualiza su última fecha de modificación, y la última fecha de modificación de I-NODO
+
+### Inciso C
+
+* Se modifica la tabla de tuplas del directorio, ahora la entrada del inciso A es: `Archivo2 --> I-NODO (es el mismo que antes)`
+* Se actualizan ambas fechas del I-NODO del directorio. 
+
+### Inciso D
+
+* Se modifica el I-NODO de Archivo2 porque aumenta su link count en 1.
+* Se agrega una entrada en la tabla de tuplas del directorio: `LinkArchivo2 --> I-NODO (es el mismo, de nuevo)`
+
+### Inciso E
+
+* El link count del I-NODO correspondiente a Archivo3 llegó a 0. El gestor de espacio libre ahora cuenta a ese I-NODO como libre.
+
+## Punto 26
+
+### Inciso A
+
+* Un sector contiene: `512 bytes / 32 bits = 128` direcciones como máximo
+* `(10*512 bytes) + (1*128*512 bytes) + (2*128*128*512 bytes) = 16.847.872 bytes`
+* Sectores necesarios para cada archivo:
+    * Archivo A (55 KiB = 56.320 bytes)
+        * Ocupa los 10 sectores referenciados directamente (ocupa 5.120 bytes, quedan 51.200 bytes por almacenar)
+        * Del sector referenciado indirectamente de manera simple, que puede tener hasta 65.536 bytes, ocupa solo 51.200 bytes
+            * De los 128 sectores, ocupa 100
+        * Usa un sector de indirección (+1)
+        * Cantidad total de sectores: `10 + 100 + 1 = 111`
+        * No utiliza los sectores con direccionamiento indirecto doble
+        * Fragmentación interna: 0
+    * Archivo B (12 KiB = 12.288 bytes)
+        * Ocupa los 10 sectores referenciados directamente (ocupa 5.120 bytes, quedan 7.168 bytes por almacenar)
+        * Del sector referenciado indirectamente de manera simple, que puede tener hasta 65.536 bytes, ocupa solo 7.168 bytes
+            * De los 128 sectores, ocupa 14
+        * Usa un sector de indirección (+1)
+        * Cantidad total de sectores: `14 + 10 + 1 = 25`
+        * No utiliza los sectores con direccionamiento indirecto doble.
+        * Fragmentación interna: 0
+    * Archivo C (1075 KiB = 1.100.800 bytes)
+        * Ocupa los 10 sectores referenciados directamente (ocupa 5.120 bytes, quedan 1.095.680 bytes por almacenar)
+        * Ocupa completamente los 128 sectores referenciado indirectamente de manera simple, (65.536 bytes, quedan 1.030.324 bytes)
+        * Usa el primero de los punteros con direccionamiento indirecto doble. Los sectores de este pueden tener hasta 8.388.608 bytes, pero solo se ocupan 1.030.324 bytes.
+            * De los 16.384 sectores, ocupa 2012.
+        * Usa 17 sectores de indirección simple y 1 de indirección doble (18 en total)
+        * Cantidad total de sectores: 128 + 10 + 2013 + 18 = 2168 sectores
+        * El último puntero con direccionamiento doble queda sin utilizar.
+        * Fragmentación interna: 0
