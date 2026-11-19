@@ -365,3 +365,19 @@
             * 0.5 REV → Latency time = 4,166ms
             * 4,166ms * (29 clusters) = 120,83ms
         * Total = `304,5ms + 0,39ms + 120,83ms = 425,72ms`
+
+## Punto 28
+
+## Inciso A
+
+* Con 8 I-NODOS por bloque
+    * `nro bloque de I-NODO 8 = [ (8-1) / 8] + 2 = 2`
+    * `nro bloque de I-NODO 9= [ (9-1) / 8] + 2 = 3`
+* Con 16 I-NODOS por bloque
+    * `nro bloque de I-NODO 8 = [ (8-1) / 16] + 2 = 2`
+    * `nro bloque de I-NODO 9 = [ (9-1) / 16] + 2 = 2`
+
+## Inciso B
+
+* El 6 arrancaría en el mismo bloque que el 8, pero con desplazamiento = `448-128 = 320`. Entonces estaría en el byte exacto 320.
+* `[(8-1) mod 24 ] * 128 bytes = byte 896`
