@@ -70,7 +70,12 @@
 * La tasa de fallos de página es un número *p* entre 0 y 1, que determina la frecuencia de los fallos de página en el sistema o en un proceso particular.
 * Si es 0, significa que no hay fallos de página.
 * Si es 1, cada acceso a memoria es un fallo de página.
-* 
+* Esta tasa puede afectar el tiempo efectivo de acceso a memoria (EAT), ya que este se determina por la siguiente fórmula:
+    * `EAT = (1 – p) x memory access + p x (tiempo_de_manejo_de_fallo + [swap_page_out] + swap_page_in + tiempo_de_restauración_de_contexto)`
+    * Notar que `swap_page_out` es opcional, porque no haría falta bajar la página a disco si esta tiene su bit M=0, o si hay frames libres en RAM.
+    * Memory access: es el tiempo de acceso a una dirección de memoria (que está en RAM).
+    * El tiempo de manejo de fallo de página incluye: el *trap*, guardar el contexto, encontrar la página nueva en disco, ordenar la operación de E/S que carga la página nueva en RAM (lo que sea que tarde la operación será el tiempo de swap_page_in), recibir la interrupción de que terminó la operación de E/S y actualizar la tabla de páginas
+    * El tiempo de restauración de contexto representa a que, cuando se vuelva a elegir el proceso que produjo el fallo de página, se deben restaurar sus registros y estado. También debe volver a ejecutarse la instrucción que falló desde 0
 
 ### Selección de página víctima
 
@@ -118,6 +123,67 @@
         * **Ventaja:** Permite aislar la tasa de fallos de página de cada proceso. Es decir, si un proceso tiene una alta tasa de fallos de página, se puede deducir que debería tener más RAM asignada. En cambio, con la política global, no hay manera de saber si realmente necesita más RAM, o si hay otro proceso quitándole frames.
 
 ## Implementaciones de tabla de páginas
+
+
+
 ## Elección de tamaño de página
+
+* Páginas pequeñas:
+    * Ventajas:
+        * Menor fragmentación interna.
+    * Desventajas:
+        * Hace que los fallos de página sean menos productivos
+        * Tabla de páginas más grande
+* Páginas grandes:
+    * Ventajas:
+        * Tabla de páginas más chica.
+        * Hace que los fallos de página sean más productivos. Es decir, se produce un fallo, se carga una página en RAM, y esa carga trae más información que si la página fuera pequeña.
+        * Aprovecha el hecho de que los discos están diseñados para transferir grandes bloques de datos eficientemente.
+        * Aprovecha mejor la TLB
+    * Desventajas
+        * Mayor fragmentación interna
+* Además, el tamaño de páginas tiene un impacto sobre el concepto de localidad, ya que páginas muy grandes pueden hacer que se traiga información fuera de la localidad, y páginas chicas pueden hacer que no se traiga toda la localidad. Esto se explica más adelante con el concepto *Thrashing*.
+
 ## TLB (Translation Lookaside buffer)
+
+* **Problema:** en memoria virtual, resolver una dirección de memoria siempre requiere como mínimo 2 accesos a RAM. Uno para encontrar el frame correspondiente en la tabla de páginas, y otro para obtener los datos del frame en el que está asignada.
+* **Solución:** se agrega una memoria caché de alta velocidad llamada TLB.
+    * Contiene las entradas de tabla de páginas de las direcciones virtuales usadas recientemente.
+    * El procesador siempre revisa la TLB antes de intentar resolver la dirección virtual por su cuenta.
+    * Al ser una memoria rápida, se considera que se analizan todas las entradas de la TLB en simultáneo
+* **Nota:** ante un cambio de contexto, se invalida totalmente la TLB. Esto sucede porque la TLB tendrá las entradas de la tabla de páginas que necesitó el proceso en ejecución. Como cada proceso tiene su propia tabla de páginas, con sus propias entradas, la TLB se debe invalidar para que no quede información sobre las páginas del proceso anterior.
+
 ## Asignación de marcos
+
+* **Concepto:** la política de asignación de marcos determina cuántos marcos va a tener un proceso a su disposición. Por ejemplo: si tengo 200 frames libres y 5 procesos, ¿Cuántos marcos puede usar cada proceso como máximo? La respuesta depende de la política de asignación que se use. Estas son: asignación fija (puede ser equitativa o proporcional) y asignación dinámica.
+
+### Asignación fija
+
+* La cantidad de frames asignados a cada proceso se determina de antemano en este tipo de asignación.
+* Siempre se combina con el alcance de reemplazo local.
+
+#### Asignación fija equitativa
+
+* Se tiene en cuenta la cantidad de frames y la cantidad de procesos, tratando a todos los procesos como iguales. Es decir, si tengo 200 frames libres y 4 procesos, cada proceso obtendrá: `200/4 = 50 frames`
+* **Problema:** no tiene en cuenta que hay procesos que necesitan más RAM que otros. En el ejemplo anterior, en el que se asignan 50 frames a cada proceso, se desperdiciaría espacio si uno de esos procesos solo necesita 10 frames.
+
+#### Asignación fija proporcional
+
+* Se tiene en cuenta el tamaño del programa correspondiente al proceso. Esto sirve como una aproximación de lo que puede llegar a ocupar en RAM.
+* **Ejemplo:** se tienen 100 frames libres y 4 procesos
+    * El proceso A tiene un programa de 100 páginas
+    * El proceso B tiene un programa de 50 páginas
+    * El proceso C tiene un programa de 20 páginas
+    * El proceso D tiene un programa de 30 páginas
+    * En total los procesos ocupan 200 páginas
+        * De esas 200: el proceso A ocupa 50%, el proceso B ocupa 25%, el proceso C 10% y el proceso D 15%
+        * Entonces, al proceso A se le asignan 50% de los 100 frames libres, al proceso B 25%, al proceso C 10% y al proceso D 15%
+        * Quedaría: proceso A con 50 frames, proceso B con 25 frames, proceso C con 10 frames y proceso D con 15 frames.
+
+### Asignación dinámica
+
+* Puede combinarse tanto con política de alcance global como local
+* La cantidad de frames asignados a cada proceso se determina durante la ejecución de los mismos.
+* Su funcionamiento consiste en que, a medida que los procesos piden memoria, se les asignan los marcos que necesitan.
+* **Problema:** los procesos de alta prioridad terminan acaparando todos los marcos
+
