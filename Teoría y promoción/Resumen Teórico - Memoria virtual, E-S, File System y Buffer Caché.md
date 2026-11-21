@@ -124,7 +124,65 @@
 
 ## Implementaciones de tabla de páginas
 
+### Tabla de 1 nivel
 
+* Tiene una entrada por cada página virtual del proceso
+    * Esto significa que su tamaño no cambia. Siempre debe tener una entrada para cada posible página, aún si el proceso solo usa un bajo porcentaje del mismo.
+* Se almacena contiguamente en memoria
+* Para traducir una dirección:
+    * La dirección tiene un número de página y un desplazamiento.
+    * Con el registro base ubica la tabla del proceso, y se ubica en la entrada con el número de página de la dirección.
+    * Una vez que detecta en qué frame está la página (si es que está), se desplaza tantos bytes como indique el desplazamiento de la dirección.
+        * En el caso de que no esté en memoria, porque V=0, ocurre un fallo de página.
+* Son 2 accesos a memoria para cada dirección (tabla de páginas + dato)
+* Ventajas:
+    * Un solo acceso a la tabla
+    * El hardware de la MMU es simple
+    * Es simple de implementar un sistema en el que 2 procesos comparten una página. Dos tablas de distintos procesos pueden tener una entrada que apunta al mismo marco.
+* Desventajas:
+    * El tamaño es proporcional al espacio virtual (inviable en arquitecturas de 64 bits)
+    * Debe ser contigua en memoria. Esto genera huecos entre páginas de datos, código y pila
+
+### Tabla multinivel
+
+* Se pagina la tabla de páginas
+* Existe una tabla similar a la tabla de 1 nivel. Cada entrada de esta apunta a otra tabla, cuyas entradas sí apuntan a frames con datos. Estas tablas de segundo nivel solo se cargan en memoria cuando se demandan, disminuyendo considerablemente el espacio que ocupa la tabla.
+* Para traducir una dirección:
+    * La dirección tiene: número de página en la tabla de nivel 1, número de página en la tabla de nivel 2, y desplazamiento.
+    * Con el registro base accede a la tabla de nivel 1 de ese proceso. Allí accede al número de página de nivel 1 de la dirección.
+    * Esa entrada está asociada a un frame, que lleva a otra tabla. Dentro de esa segunda tabla, ubica el número de página de nivel 2 (el que está almacenada en la dirección), y se desplaza los bytes que indique el valor del desplazamiento.
+* Son 3 accesos a memoria (tabla nivel 1 + tabla nivel 2 + dato)
+* Este esquema puede expandirse a más de 2 niveles. En arquitecturas de 64 bits se usan 4 o 5.
+* Ventajas:
+    * La tabla ocupa menos espacio, ya que las de 2do nivel no están siempre cargadas.
+    * Cada tabla cabe en un marco, no requiere espacios contiguos grandes
+    * Las subtablas que corresponderían a partes inutilizadas del espacio de direcciones del proceso, directamente no se crean.
+* Desventajas:
+    * Un acceso extra por nivel
+    * Recorrido más complejo
+
+### Tabla invertida
+
+* Hay una entrada por cada marco físico. Por lo tanto, deja de haber una tabla para cada proceso. Ahora hay una sola tabla para todo el sistema.
+* En cada entrada se almacena:
+    * Número de página, PID del proceso al que corresponde y "siguiente frame” (este último se usa para manejar las colisiones, como en el siguiente ejemplo).
+* Resolución de direcciones:
+    * Se usa el PID y el número de página como entrada a una función de *hash*, que devuelve un número.
+    * Ese número, (por ejemplo, 45), se busca en una tabla llamada tabla de anclaje.
+        * Esta almacena, para cada resultado de hash, qué frame le corresponde.
+        * Por ejemplo, una entrada podría ser:
+            * hash 45 → frame 20
+        * Entonces, cuando obtenga el número 45 de la función de hash, lo busca en la tabla y encuentra que esa página está en el frame 20
+        * Luego, se debe revisar si, en el frame 20, están almacenados el PID y el número de página correspondientes. Si no lo están, se revisa el campo "siguiente frame", y se revisa (en la tabla), la entrada del frame almacenado allí. Una vez que se encuentra el PID y número de página correspondientes, finaliza la búsqueda. Si nunca se encuentra, hay un fallo de página
+* Ventajas:
+    * Tamaño fijo proporcional a la RAM
+    * Una sola tabla para todos los procesos
+    * Independiente del espacio virtual. Apta para 64 bits
+* Desventajas
+    * Requiere de una búsqueda en cada traducción
+    * Depende fuertemente de la TLB
+    * Compartir páginas es complejo debido a la naturaleza de las funciones de dispersión
+    * Las páginas que no están en memoria no figuran en la tabla
 
 ## Elección de tamaño de página
 
