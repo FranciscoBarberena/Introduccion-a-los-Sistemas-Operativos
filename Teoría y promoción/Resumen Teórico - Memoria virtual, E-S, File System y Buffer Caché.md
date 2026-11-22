@@ -245,3 +245,65 @@
 * Su funcionamiento consiste en que, a medida que los procesos piden memoria, se les asignan los marcos que necesitan.
 * **Problema:** los procesos de alta prioridad terminan acaparando todos los marcos
 
+## Hiperpaginación
+
+* Un sistema está en hiperpaginación (o *thrashing*) cuando pasa más tiempo paginando que ejecutando procesos.
+* Usar un alcance de reemplazo local evita el robo de frames, por lo que limita el efecto del thrashing a un solo proceso.
+
+### Modelo de localidad
+
+* Las referencias a datos y programa dentro de un proceso tienden a agruparse. Es decir, es probable que un proceso necesite las páginas 5-10 durante un tiempo, hasta que, repentinamente, use las páginas 18-24. Este conjunto de páginas que se usa durante un período de tiempo se denomina localidad.
+* Lo ideal sería que, en memoria, esté cargada la localidad que se está usando en el momento. Y que los *page faults* solo ocurran cuando se cambia de localidad.
+
+### Working set (WS)
+
+* Se define un Δ. (Por ejemplo, Δ = 5)
+* El working set de un proceso consiste de las más recientes Δ referencias a páginas.
+* En el ejemplo anterior, si un proceso referenció a las páginas en este orden: 12233445, el working set sería {5,4,3}.
+* Una elección de Δ muy chico no cubrirá la localidad, mientras que un Δ muy grande abarcaría varias localidades.
+* ¿Cómo detectar thrashing con este método?
+    * m = cantidad de frames disponibles
+    * WSS de A= tamaño del working set del proceso A.
+    * Suma de todos los WSS: la llamamos D, es la demanda de frames que tiene el sistema.
+    * Si D>m, entonces hay thrashing, ya que el sistema está demandando más frames de los que hay disponibles.
+* El kernel asigna tantos frames a cada proceso como lo determine su WSS. Si D crece por encima de m, se elige un proceso para sacar de memoria, disminuyendo el grado de multiprogramación.
+* **Desventaja:** es costoso mantener un registro de los WSS de todos los procesos. Además, la ventana de working set es móvil.
+
+### Page fault frequency (PFF)
+
+* Surge como una aproximación más económica al working set.
+* Usa la tasa de fallos de página de un proceso.
+* El kernel determina una cota inferior y una cota superior de tasas de fallo
+    * Si la tasa de un proceso supera la cota superior, necesita más frames.
+    * Si la tasa de un proceso está por debajo de la cota inferior, se le pueden quitar frames.
+* ¿Cómo detectar thrashing con este método?
+    * Si todos los procesos tienen una tasa de fallo mayor a la cota superior, y no hay frames libres que asignarles, el sistema está en thrashing. Se debe bajar el grado de multiprogramación.
+
+## Demonio de paginación
+
+* Es un proceso creado por el *kernel* durante el arranque del sistema.
+* Ayuda a administrar la memoria. Se ejecuta cuando la cantidad de memoria libre queda por debajo de un número de frames establecido por el kernel, o hay muchas páginas “sucias” (bit M=1). También se ejecuta cuando la CPU tiene baja utilización, para aprovechar tiempo ocioso.
+* Tareas:
+    * Limpiar páginas modificadas, sincronizándolas con el área de SWAP.
+    * Mantener un cierto número de frames libres en el sistema en todo momento.
+    * Demorar la liberación de una página hasta que sea necesario.
+
+## Memoria compartida
+
+* Los procesos pueden compartir frames. Es decir, un proceso A puede tener su página 2 asociada al frame 5, mientras que al mismo tiempo, la página 7 del proceso B apunta al mismo frame (5).
+
+### Mapeo de archivo a memoria
+
+* Un proceso asocia el contenido de un archivo a una zona contigua en su espacio de direcciones. Por ejemplo, 1000h-1200h
+    * En este paso **no se carga nada en memoria aún**.
+* Cuando intenta acceder a la dirección 1100h, se produce un fallo de página, y es en ese momento que *esa parte* del archivo se carga en memoria. Para resolver este fallo de página, hay que buscar el contenido al archivo. No hay que acceder al área de SWAP.
+* Si se modifica alguna de esas páginas en RAM, cuando se bajan a disco, se bajan al archivo en vez de al SWAP también.
+
+### Copy on Write
+
+* Cuando 2 procesos comparten un frame, el kernel marca esas páginas (en las tablas de los 2 procesos) como Copy on Write (COW), lo que las hace de solo lectura.
+    * Esto significa que, cuando alguno de los 2 procesos intente escribir esa página, no van a poder escribirla directamente. Esto generará un trap por error de permisos, que hace que en el momento de la escritura, se duplique la página, y los procesos van a dejar de compartir la página. Debe actualizar la tabla de páginas del proceso que la escribió, y hacer que la página del otro ya no sea COW.
+* Consecuencia: a nivel frames, un fork tiene costo 0 hasta que el nuevo proceso empiece a escribir frames.
+
+### Implementación de área de SWAP
+
