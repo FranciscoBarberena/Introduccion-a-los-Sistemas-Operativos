@@ -28,7 +28,8 @@
         * Lo manipula el kernel y lo consulta el hardware.
     * **Bit M:** indica si la página fue modificada desde que se cargó en RAM
         * Lo activa el hardware, lo consulta y desactiva el kernel.
-    * **Bit R:** indica si la página fue referenciada desde cierto punto, determinado por el algoritmo usado por el kernel para seleccionar víctimas. Lo manipula el hardware y lo consulta el kernel.
+    * **Bit R:** indica si la página fue referenciada desde cierto punto, determinado por el algoritmo usado por el kernel para seleccionar víctimas.
+        * Lo activa el hardware y lo consulta y desactiva el kernel.
     * Entre otros
 * Ejemplos de manejo de los bits de control (¿Qué significa que los manipulen o consulten el hardware/kernel?):
     * **Bit V:**
@@ -81,7 +82,7 @@
 
 * **Problema:** ¿Qué pasa si sucede un fallo de página, y no hay frames libres para asignarle a la página que debe ser cargada en memoria?
 * **Solución:** el kernel debe seleccionar una de las páginas que está cargada en memoria, y sacarla de la RAM (bajándola a SWAP si su bit M=1). La página que se selecciona para sacar de la RAM se denomina *página víctima*.
-* Lo ideal sería seleccionar a aquella página que no volverá a ser utilizada por ningún proceso en el futuro. Esto se denomina algoritmo óptimo, y es únicamente teórico, ya que es imposible predecir con exactitud las páginas que va a a necesitar un proceso. Sin embargo, se desarrollaron distintos algoritmos que intentan aproximarse al óptimo. Estos son: FIFO, 2da Chance, NRU y LRU.
+* Lo ideal sería seleccionar a aquella página que no volverá a ser utilizada por ningún proceso en el futuro. Esto se denomina algoritmo óptimo, y es únicamente teórico, ya que es imposible predecir con exactitud las páginas que va a necesitar un proceso. Sin embargo, se desarrollaron distintos algoritmos que intentan aproximarse al óptimo. Estos son: FIFO, 2da Chance, NRU y LRU.
 
 #### FIFO
 
@@ -306,4 +307,12 @@
 * Consecuencia: a nivel frames, un fork tiene costo 0 hasta que el nuevo proceso empiece a escribir frames.
 
 ### Implementación de área de SWAP
+
+* Puede ser un área separada del sistema de archivos, como en Linux, o puede estar integrada como en Windows.
+* Hay 2 técnicas de administración:
+    * **Opción 1:** cada vez que se crea un proceso, se reserva una parte del área de swap para él. El tamaño de la misma es igual a lo que ocupa el proceso en su espacio de direcciones (sumado a estructuras de datos necesarias para su mantenimiento como la PCB). El kernel guarda la primera dirección del área reservada, y luego usa el número de página como desplazamiento.
+    * **Opción 2:** no se reserva nada inicialmente. A cada página se le asigna un espacio en SWAP cada vez que se baja a SWAP, y se libera cuando se vuelve a cargar en RAM. Requiere de mantener la contabilidad de la ubicación de las páginas en SWAP.
+* Direccionamiento:
+    * La PTE de una página tiene el bit V, el número de frame y otros bit de control. Cuando una página está en swap, todos los bits excepto por el bit V se vuelven inútiles. Entonces, esos bits restantes se usan para determinar la ubicación de una página en SWAP.
+    * En particular, los bits restantes se usan para determinar en qué area de swap está (puede haber muchas en un sistema), y para determinar el “slot” que ocupa dentro de la misma. Un slot es una parte del disco con tamaño igual a una página.
 
