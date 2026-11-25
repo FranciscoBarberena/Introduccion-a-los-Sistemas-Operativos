@@ -412,8 +412,8 @@
 * Recibe la instrucción open con el path del archivo
 * ¿Cómo sabe dónde encontrar ese path?
     * Tiene un archivo con la información de los puntos de montaje. Una de sus líneas podría ser:
-        * /home -- sda2 -- rw -- ext4
-    * Como el path empieza con `/home`, ahora el subsistema sabe que está en una partición de lectura y escritura, ext4, en el dispositivo sda2.
+        * `/home -- sda2 -- rw -- ext4`
+    * Como el path empieza con `/home`, ahora el subsistema sabe que está en una partición de lectura y escritura, ext4, en el dispositivo `sda2`.
 * ¿Cómo lee un archivo ext4?
     * Le envía read(francisco/pepe.txt) al file system
     * El file system necesita la información del `/dev/sda2`. Le pide eso al subsistema, que a su vez se lo envía a otro módulo (`/dev`). Este último módulo tiene toda la información sobre el disco (rígido/sólido, etc). El subsistema usa esa información para ver a qué driver derivarle la tarea
@@ -429,7 +429,7 @@
 
 ### Buffer caché system V
 
-* Implementación de caché de disco en system V
+* Implementación de caché de disco en system V. No todos los sistemas operativos usan esta implementación.
 * Es una estructura de datos formada por buffers
 * Cada buffer tiene:
     * El **buffer** en sí: el lugar donde se almacena el bloque de disco traído a memoria
@@ -445,12 +445,87 @@
         * 2 punteros para la hash queue
         * 2 punteros para la free list
         * 1 puntero al bloque en memoria (puntero al buffer en sí)
-        * Las 2 listas son doblemente enlazadas (por eso son 2 puntero, uno al siguiente y uno al anterior)
+        * Las 2 listas son doblemente enlazadas (por eso son 2 punteros, uno al siguiente y uno al anterior)
 * Listas
     * **Free list:** lista doblemente enlazada de los buffers disponibles. Sirve para buscar un buffer libre para asignarle a un nuevo bloque
-        * Se ordena según LRU/LFU
+        * Se ordena según LRU
         * Los bloques no están necesariamente vacíos. El proceso puede haber terminado, pero que siga en estado de delayed write. Si se busca un buffer libre, y se encuentra uno en estado de delayed write, se manda a escribir ese bloque y se usa el siguiente de la free list. Esto se repite hasta encontrar uno que no esté en delayed write. Cuando se termina de escribir un bloque, vuelven al *inicio* de la free list, no al final.
     * **Hash queue:** colas para optimizar la búsqueda de un buffer en particular. Sirve para determinar si un bloque está o no en caché. Solo están en la hash queue si realmente están en la caché
         * Los headers se organizan según una función de hash f(dispositivo, `#bloque`). Se agrupan los bloques cuyo resultado dio igual en la misma hash queue, para facilitar la búsqueda.
         * Hay tantas hash queues como haya posibles resultados de la función de hashing.
-* Importante: siempre que se necesita reacomodar estructuras, lo único que realmente se modifican son los punteros. No se intercambian las ubicaciones en memoria realmente.
+* **Importante:** siempre que se necesita reacomodar estructuras, lo único que realmente se modifican son los punteros. No se intercambian las ubicaciones en memoria realmente.
+
+# File system
+
+## Unidades de asignación
+
+* La unidad de asignación que usa el kernel determina el tamaño mínimo que van a ocupar los datos de un archivo.
+    * Por ejemplo, si un archivo tiene 2 bytes de datos, pero la unidad de asignación es un sector de 512B, a esos 2 bytes se le asignarán un sector. Quedarían 510 bytes de fragmentación interna. El archivo ocuparía 512 bytes en la realidad.
+* Puede ser un sector de disco, o un cluster (conjunto de sectores consecutivos)
+* Ventajas de usar clusters grandes
+    * Existen menos unidades que direccionar, por lo que las estructuras de datos como el gestor de espacio libre se vuelven más chicas.
+    * Se hace más productivo el tiempo de seek, ya que una búsqueda resulta en traer múltiples sectores a memoria en vez de uno solo. Esto es útil cuando la información está almacenada de manera secuencial y no aleatoria.
+* La desventaja de tener clusters más grandes es, como se vio en el ejemplo anterior, que hay más fragmentación interna.
+
+## Formas de asignación
+
+### Pre-asignación
+
+* Al momento de crear un archivo, se le asigna cierto espacio (generalmente mayor a su tamaño esperado).
+* Suele usar la forma de asignación continua.
+* **Desventaja:** se necesita saber de antemano el tamaño de un archivo
+
+### Asignación dinámica
+
+* El espacio se asigna a medida que se solicita. Pueden quedar archivos almacenados de manera no continua.
+
+### Asignación continua
+
+* En la FAT (*File Allocation Table*) se almacena para cada archivo: número de bloque en donde comienza su almacenamiento, y longitud en bloques. Por ejemplo se podría almacenar:
+    * `File A --- Start block 5 --- Length 4`
+    * Esto nos dice que el archivo A está almacenado en los bloques 5, 6, 7, y 8.
+* **Ventajas:**
+    * La FAT es simple, y el archivo se puede leer con solo una operación.
+    * Se puede leer el bloque X de un archivo en un solo acceso, ya que solo se hace `bloque_inicio` + X para acceder a él.
+* **Desventajas:**
+    * **Fragmentación externa**. Si necesito guardar un archivo de 20 bloques, necesito que haya 20 bloques continuos libres. Si existe un conjunto de 19 bloques libres, no se puede usar, y ese espacio queda como fragmentación externa.
+    * Requiere de la pre-asignación.
+        * Resulta difícil aumentar el tamaño de un archivo si sus bloques consecutivos fueron ocupados por otro. No sirve para sistemas de archivos con alta volatilidad.
+
+### Asignación encadenada
+
+* En la FAT se almacena para cada archivo: número de bloque en donde comienza su almacenamiento, y longitud en bloques.
+* En cada bloque, además del contenido del archivo, se almacena un puntero al siguiente bloque.
+* **Ventajas:**
+    * Útil para acceso secuencial
+    * No hay fragmentación externa
+    * Los archivos pueden crecer y ser volátiles
+    * No se requieren bloques contiguos
+        * **Nota**: por temas de optimización, se puede consolidar el disco para que los bloques queden almacenados de manera contigua igualmente, pero no es necesario. Funciona similar a la compactación en la asignación continua.
+* **Desventajas:**
+    * No sirve para acceso aleatorio. Para acceder a un bloque, se deben acceder a todos sus anteriores.
+    * Pierde el principio de localidad espacial, ya que los bloques de un mismo archivo quedan dispersos en el disco.
+    * Al almacenar un puntero al siguiente bloque, se pierde un poco de capacidad de almacenamiento en cada bloque.
+
+### Asignación indexada
+
+* En la FAT se almacena para cada archivo, el número de su bloque índice.
+* Un bloque índice contiene una lista de punteros a los bloques con el contenido del archivo.
+* **Ventajas**:
+    * No hay fragmentación externa.
+    * Tanto el acceso secuencial como el random son eficientes.
+* **Desventajas:**
+    * Requiere almacenar un índice para cada archivo. Además, dicho índice se debe leer para acceder al archivo, así que la cantidad de lecturas aumenta en 1.
+* Se le pueden agregar niveles de indirección. Es decir, que la FAT apunte a un índice, y que el índice del archivo contenga:
+    * Punteros a bloques de datos
+    * Punteros a otros índices
+        * A su vez, estos podrían tener más índices, aumentando en 1 la indirección cada vez.
+
+#### Asignación indexada por secciones
+
+* A cada entrada del bloque índice se le agrega el campo longitud.
+* Por lo tanto, ahora cada entrada del bloque índice apunta a un conjunto de bloques almacenado contiguamente.
+* **Ventaja**: mejora la proximidad y achica el índice
+* **Desventaja**: reintroduce la fragmentación externa. Si la longitud del conjunto de bloques al que se referencia es de 10, y hay espacios libres continuos de 9, no se pueden usar.
+
+## Gestión de espacio libre
