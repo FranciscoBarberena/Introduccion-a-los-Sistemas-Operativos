@@ -529,3 +529,32 @@
 * **Desventaja**: reintroduce la fragmentación externa. Si la longitud del conjunto de bloques al que se referencia es de 10, y hay espacios libres continuos de 9, no se pueden usar.
 
 ## Gestión de espacio libre
+
+### Tabla de bits
+
+* Es un array que tiene un bit por cada unidad de asignación. Un valor de 0 indica libre, y un valor de 1 indica ocupado.
+* **Ventaja:** fácil de encontrar espacio libre, sea continuo o no.
+* **Desventaja:** si hay muchas unidades de asignación en el sistema, el arreglo se vuelve muy grande como para cargarlo en la RAM.
+    * **Nota:** clusters más grandes ayudan a que esto no pase, ya que implican menos entradas en el vector de bits.
+
+### Bloques libres enlazados
+
+* Cada bloque libre de la memoria tiene un puntero al siguiente bloque libre. Además, se guarda un puntero al primer bloque libre (lista enlazada).
+* **Ventaja:** no requiere una estructura de datos adicional
+* **Desventajas:**
+    * Es difícil de buscar bloques libres continuos.
+    * Es poco tolerante a fallos. Si se pierde un enlace, se pierde toda la estructura.
+    * Para cada búsqueda de un bloque libre, se requiere un acceso a disco.
+
+### Indexación o agrupamiento
+
+* Es una variante de los bloques libres enlazados.
+* El primer bloque libre contiene las direcciones de N bloques libres. La última de estas es una referencia a otro bloque con N direcciones libres.
+* **Ventaja**: permite obtener las direcciones de múltiples bloques libres con una sola lectura de disco (al leer el índice).
+
+### Recuento
+
+* Similar al anterior, pero en cada entrada se guarda un puntero a un conjunto de bloques libres.
+* Una entrada podría ser: bloque 1, length 8. Esto nos dice que el primer bloque libre es el 1, y que los siguientes 7 también están libres.
+* **Ventaja:** achica las estructuras de datos (índices)
+* **Desventaja:** es difícil de mantener el recuento
