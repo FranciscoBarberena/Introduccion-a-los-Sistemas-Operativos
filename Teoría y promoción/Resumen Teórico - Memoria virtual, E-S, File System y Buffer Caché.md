@@ -316,3 +316,141 @@
     * La PTE de una página tiene el bit V, el número de frame y otros bit de control. Cuando una página está en swap, todos los bits excepto por el bit V se vuelven inútiles. Entonces, esos bits restantes se usan para determinar la ubicación de una página en SWAP.
     * En particular, los bits restantes se usan para determinar en qué area de swap está (puede haber muchas en un sistema), y para determinar el “slot” que ocupa dentro de la misma. Un slot es una parte del disco con tamaño igual a una página.
 
+# Entrada / Salida
+
+## Variedad de dispositivos
+
+* Los dispositivos de entrada salida varían en su:
+    * Modo de transferencia de datos (por caracter o por bloques)
+    * Modo de acceso (secuencial o aleatorio)
+    * Sincronización (sincrónico o asincrónico)
+    * Modo de compartido (exclusivo o compartido)
+        * Determina si 2 procesos pueden usar el mismo dispositivo al mismo tiempo, como a un disco, o no, como a una impresora
+    * Velocidad
+        * Tienen distintos tiempos, y todos son órdenes de magnitud más lentos que la RAM y la CPU
+    * Dirección de E/S
+        * Solo lectura, solo escritura o read/write
+
+### Tipos de entrada salida
+
+* Ver anexo
+
+## Responsabilidades del SO (subsistema de E/S)
+
+* Controlar los dispositivos de E/S
+    * Generar comandos
+    * Manejar interrupciones
+    * Manejar errores
+* Proporcionar una interfaz de utilización
+* Generalidad
+    * El subsistema de E/S del kernel debe manejar todos los dispositivos de E/S de una manera uniforme y estandarizada
+    * Esto significa ocultar los detalles de bajo nivel a los procesos, para que estos simplemente le manden al kernel instrucciones estandarizadas como “read, write, etc”
+* Eficiencia
+    * Como los dispositivos de E/S son más lentos que la CPU, se debe aprovechar la CPU ejecutando otro proceso mientras se está esperando una E/S
+* Planificación
+    * Debe organizar los requerimientos de los distintos dispositivos de manera eficiente. Un ejemplo son los algoritmos de planificación de discos que vemos en la práctica (SCAN, LOOK, etc)
+* Buffering
+    * Consiste en almacenar los datos en memoria mientras se transfieren
+* Caching
+    * Mantener en memoria copia de los datos de reciente acceso para mejorar performance
+* Spooling
+    * Sirve para controlar el acceso concurrente a un dispositivo sin que se pisen los procesos.
+    * No se ejecuta en modo kernel
+* Reserva de dispositivos
+    * Para dispositivos con acceso exclusivo como las impresoras
+* Manejo de Errores
+    * Administrar errores ocurridos (de lectura, escritura, dispositivo no disponible, etc)
+    * Mantiene logs de errores
+    * Cada error devuelve un código de error
+* Formas de realizar E/S
+    * **Bloqueante:** el proceso se suspende hasta que se resuelve la E/S que pidió. Queda en estado waiting hasta que se resuelva el requerimiento.
+    * **No bloqueante:** el requerimiento de E/S se retorna en cuanto es posible. El proceso, mientras se atiende el requerimiento, continúa en estado de running. Requiere implementar una manera de checkear si se resolvió la E/S o no.
+
+## Capas de software de E/S
+
+### Software de E/S de capa de usuario (funciones wrappers)
+
+* Como su nombre lo indica, se ejecuta en modo usuario.
+* Usa librerías de funciones wrappers, que permiten el acceso a system calls
+* Incluye a procesos de apoyo como el spooling
+
+### Software de SO independiente del dispositivo (subsistema de E/S)
+
+* Se ejecuta en modo kernel
+* Brinda los principales servicios mencionados en el encabezado anterior, usando las instrucciones de las funciones wrappers y traduciéndolas a instrucciones genéricas
+* El kernel debe mantener la información de estado de cada dispositivo
+    * Archivos abiertos, conexiones de red, etc.
+
+### Controladores de dispositivos (drivers)
+
+* Se ejecutan en modo kernel
+* Contienen el código dependiente del dispositivo específico que manejan
+* Traducen los requerimientos abstractos del software de la capa anterior a instrucciones que el dispositivo puede entender.
+* Lo desarrollan los creadores del hardware del dispositivo. Lo hacen teniendo en cuenta una API establecida por el SO, implementando instrucciones como read, write, open, etc.
+* Como Linux es modular, se le pueden agregar drivers sin modificar el kernel.
+
+### Gestor de interrupciones
+
+* Se ejecuta en modo kernel
+* Atiende las interrupciones por hardware
+* Resguarda el estado actual y deriva al driver correspondiente.
+* Independiente de los drivers
+
+## Flujo de una operación de E/S
+
+## Modo usuario
+
+* Se ejecuta:
+    * var archivo = open (“/home/francisco/pepe.txt”)
+    * read(archivo)
+    * Se envía open (función wrapper) al subsistema de E/S (Software de SO independiente del dispositivo)
+
+## Modo kernel
+
+### Subsistema de E/S
+
+* Recibe la instrucción open con el path del archivo
+* ¿Cómo sabe dónde encontrar ese path?
+    * Tiene un archivo con la información de los puntos de montaje. Una de sus líneas podría ser:
+        * /home -- sda2 -- rw -- ext4
+    * Como el path empieza con `/home`, ahora el subsistema sabe que está en una partición de lectura y escritura, ext4, en el dispositivo sda2.
+* ¿Cómo lee un archivo ext4?
+    * Le envía read(francisco/pepe.txt) al file system
+    * El file system necesita la información del `/dev/sda2`. Le pide eso al subsistema, que a su vez se lo envía a otro módulo (`/dev`). Este último módulo tiene toda la información sobre el disco (rígido/sólido, etc). El subsistema usa esa información para ver a qué driver derivarle la tarea
+
+## Caché de disco
+
+* Su objetivo es minimizar la cantidad de accesos a disco.
+* Son un conjunto de áreas de la RAM, que mantienen temporalmente bloques de disco. De esta manera, cuando un proceso los necesita, accede al buffer de la RAM en vez de al disco.
+* Dos opciones cuando un proceso intenta acceder a un bloque que está en la caché.
+    * Se copia de la caché al espacio de direcciones del proceso (no permite compartir datos).
+    * Se trata a la caché como memoria compartida. El área debe ser limitada así que se implementa un algoritmo de reemplazo
+        * Generalmente se usa LRU o LFU (LFU reemplaza al que tiene el menor número de referencias). De esta manera se mantienen en memoria los bloques que se están utilizando.
+
+### Buffer caché system V
+
+* Implementación de caché de disco en system V
+* Es una estructura de datos formada por buffers
+* Cada buffer tiene:
+    * El **buffer** en sí: el lugar donde se almacena el bloque de disco traído a memoria
+    * **Header:** información sobre dicho bloque. Número de bloque, estado, relación con otros buffers, etc.
+* Estructura del header:
+    * Número de bloque, ID del dispositivo correspondiente al bloque (en qué partición está)
+    * Estado (4 posibles)
+        * **Free:** el bloque al que apunta se puede utilizar
+        * **Busy:** lo está usando un proceso
+        * Se está escribiendo o leyendo del disco.
+        * **Delayed write:** se modificó el bloque en la caché, pero todavía no se bajó a disco (sucio).
+    * Punteros
+        * 2 punteros para la hash queue
+        * 2 punteros para la free list
+        * 1 puntero al bloque en memoria (puntero al buffer en sí)
+        * Las 2 listas son doblemente enlazadas (por eso son 2 puntero, uno al siguiente y uno al anterior)
+* Listas
+    * **Free list:** lista doblemente enlazada de los buffers disponibles. Sirve para buscar un buffer libre para asignarle a un nuevo bloque
+        * Se ordena según LRU/LFU
+        * Los bloques no están necesariamente vacíos. El proceso puede haber terminado, pero que siga en estado de delayed write. Si se busca un buffer libre, y se encuentra uno en estado de delayed write, se manda a escribir ese bloque y se usa el siguiente de la free list. Esto se repite hasta encontrar uno que no esté en delayed write. Cuando se termina de escribir un bloque, vuelven al *inicio* de la free list, no al final.
+    * **Hash queue:** colas para optimizar la búsqueda de un buffer en particular. Sirve para determinar si un bloque está o no en caché. Solo están en la hash queue si realmente están en la caché
+        * Los headers se organizan según una función de hash f(dispositivo, `#bloque`). Se agrupan los bloques cuyo resultado dio igual en la misma hash queue, para facilitar la búsqueda.
+        * Hay tantas hash queues como haya posibles resultados de la función de hashing.
+* Importante: siempre que se necesita reacomodar estructuras, lo único que realmente se modifican son los punteros. No se intercambian las ubicaciones en memoria realmente.
