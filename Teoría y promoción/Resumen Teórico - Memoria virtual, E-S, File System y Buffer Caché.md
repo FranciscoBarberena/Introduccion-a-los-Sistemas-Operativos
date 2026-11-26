@@ -331,9 +331,32 @@
     * Dirección de E/S
         * Solo lectura, solo escritura o read/write
 
-### Tipos de entrada salida
+## Tipos de entrada salida
 
-* Ver anexo
+### E/S Mapeada en memoria y E/S aislada
+
+* Mapeada en memoria
+    * Los dispositivos de E/S usan la RAM común.
+    * Hacer entrada salida es como escribir en la memoria.
+    * No hay instrucciones especiales para E/S. (No existirían IN, OUT).
+    * Consume más memoria.
+* Aislada
+    * Espacio separado de direcciones.
+    * Se necesitan instrucciones especiales y puertos de E/S.
+
+### Programada
+
+* CPU controla directamente la I/O.
+* Se desperdician ciclos de CPU
+* Requiere de polling. Es decir, la CPU debe consultar constantemente si el dispositivo está disponible para usar. Esto puede ser muy costoso.
+
+### Interrupciones
+
+* El CPU ejecuta instrucciones normalmente hasta que recibe una interrupción de un dispositivo que le indica que está libre. Recién en ese momento se utiliza. Soluciona el problema del polling.
+
+### DMA
+
+* Un componente de DMA controla el intercambio de datos entre la RAM y el dispositivo de E/S, sin usar ciclos de CPU más allá de la programación del DMA. El CPU es interrumpido una vez que el bloque de memoria fue transferido al dispositivo.
 
 ## Responsabilidades del SO (subsistema de E/S)
 
@@ -395,28 +418,6 @@
 * Atiende las interrupciones por hardware
 * Resguarda el estado actual y deriva al driver correspondiente.
 * Independiente de los drivers
-
-## Flujo de una operación de E/S
-
-## Modo usuario
-
-* Se ejecuta:
-    * var archivo = open (“/home/francisco/pepe.txt”)
-    * read(archivo)
-    * Se envía open (función wrapper) al subsistema de E/S (Software de SO independiente del dispositivo)
-
-## Modo kernel
-
-### Subsistema de E/S
-
-* Recibe la instrucción open con el path del archivo
-* ¿Cómo sabe dónde encontrar ese path?
-    * Tiene un archivo con la información de los puntos de montaje. Una de sus líneas podría ser:
-        * `/home -- sda2 -- rw -- ext4`
-    * Como el path empieza con `/home`, ahora el subsistema sabe que está en una partición de lectura y escritura, ext4, en el dispositivo `sda2`.
-* ¿Cómo lee un archivo ext4?
-    * Le envía read(francisco/pepe.txt) al file system
-    * El file system necesita la información del `/dev/sda2`. Le pide eso al subsistema, que a su vez se lo envía a otro módulo (`/dev`). Este último módulo tiene toda la información sobre el disco (rígido/sólido, etc). El subsistema usa esa información para ver a qué driver derivarle la tarea
 
 ## Caché de disco
 
@@ -558,3 +559,17 @@
 * Una entrada podría ser: bloque 1, length 8. Esto nos dice que el primer bloque libre es el 1, y que los siguientes 7 también están libres.
 * **Ventaja:** achica las estructuras de datos (índices)
 * **Desventaja:** es difícil de mantener el recuento
+
+## File system en UNIX
+
+* Cada partición de disco tiene un sistema de archivos con las siguientes partes:
+    * **Boot block:** código para bootear el SO. Solo se usa en la partición marcada como booteable.
+    * **Super block:** atributos sobre el file system (tamaño de bloque, tamaño de la partición, etc.).
+    * **Free space management:** alguna de las implementaciones vista antes de gestión de espacio libre (tabla de bits por ejemplo). A veces se incluye en el super block
+    * **Tabla de I-NODOS:** tiene tantas entradas como posibles archivos en el file system. Cada entrada contiene datos sobre el archivo como: tipo, hard link count, permisos, fecha de modificación de contenido, fecha de modificación de I-NODO, etc. Cada entrada también tiene direcciones a bloques con datos, y a bloques que llevan a otros bloques (usa direccionamiento indexado indirecto).
+    * **Directorio raíz:** directorio base de esa partición (con un número de i-nodo fijo) desde donde comienza la búsqueda de archivos en ese volumen cuando se lo acopla a un punto de montaje del sistema.
+    * Los archivos y directorios en sí
+
+### Directorios
+
+* Un directorio es un archivo que consiste de una tabla. Cada entrada de la tabla tiene los nombres de los archivos que contiene junto con su número de I-NODO.
